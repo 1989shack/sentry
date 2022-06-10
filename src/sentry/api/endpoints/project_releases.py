@@ -151,8 +151,7 @@ class ProjectReleasesEndpoint(ProjectEndpoint, EnvironmentMixin):
 
                 created = release.add_project(project)
 
-                commit_list = result.get("commits")
-                if commit_list:
+                if commit_list := result.get("commits"):
                     hook = ReleaseHook(project)
                     # TODO(dcramer): handle errors with release payloads
                     hook.set_commits(release.version, commit_list)
@@ -166,15 +165,7 @@ class ProjectReleasesEndpoint(ProjectEndpoint, EnvironmentMixin):
                         datetime=release.date_released,
                     )
 
-                if not created:
-                    # This is the closest status code that makes sense, and we want
-                    # a unique 2xx response code so people can understand when
-                    # behavior differs.
-                    #   208 Already Reported (WebDAV; RFC 5842)
-                    status = 208
-                else:
-                    status = 201
-
+                status = 201 if created else 208
                 analytics.record(
                     "release.created",
                     user_id=request.user.id if request.user and request.user.id else None,

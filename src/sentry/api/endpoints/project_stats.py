@@ -58,7 +58,7 @@ class ProjectStatsEndpoint(ProjectEndpoint, EnvironmentMixin, StatsMixin):
             try:
                 stat_model = FILTER_STAT_KEYS_TO_VALUES[stat]
             except KeyError:
-                raise ValueError("Invalid stat: %s" % stat)
+                raise ValueError(f"Invalid stat: {stat}")
 
         data = tsdb.get_range(
             model=stat_model, keys=[project.id], **self._parse_args(request, **query_kwargs)

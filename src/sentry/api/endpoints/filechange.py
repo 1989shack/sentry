@@ -41,9 +41,7 @@ class CommitFileChangeEndpoint(OrganizationReleasesBaseEndpoint):
             )
         )
 
-        repo_name = request.query_params.get("repo_name")
-
-        if repo_name:
+        if repo_name := request.query_params.get("repo_name"):
             try:
                 repo = Repository.objects.get(organization_id=organization.id, name=repo_name)
                 queryset = queryset.filter(commit__repository_id=repo.id)

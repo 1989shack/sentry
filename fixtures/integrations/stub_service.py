@@ -41,8 +41,7 @@ class StubService:
         :return: object
         """
         cache_key = f"{service_name}.{name}"
-        cached = StubService.stub_data_cache.get(cache_key)
-        if cached:
+        if cached := StubService.stub_data_cache.get(cache_key):
             data = cached
         else:
             data = json.loads(StubService.get_stub_json(service_name, name))

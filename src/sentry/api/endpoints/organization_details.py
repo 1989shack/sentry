@@ -250,9 +250,9 @@ class OrganizationSerializer(serializers.Serializer):
                 "Organization does not have the relay feature enabled"
             )
 
-        # make sure we don't have multiple instances of one public key
-        public_keys = set()
         if value is not None:
+            # make sure we don't have multiple instances of one public key
+            public_keys = set()
             for key_info in value:
                 key = key_info.get("public_key")
                 if key in public_keys:
@@ -323,19 +323,18 @@ class OrganizationSerializer(serializers.Serializer):
             modified = True
 
         if modified:
-            # we have some modifications create a log message
-            if existing is not None:
-                # generate an update log message
-                changed_data["trustedRelays"] = f"from {existing} to {incoming}"
-                existing.value = incoming
-                existing.save()
-            else:
+            if existing is None:
                 # first time we set trusted relays, generate a create log message
                 changed_data["trustedRelays"] = f"to {incoming}"
                 OrganizationOption.objects.set_value(
                     organization=organization, key=option_key, value=incoming
                 )
 
+            else:
+                # generate an update log message
+                changed_data["trustedRelays"] = f"from {existing} to {incoming}"
+                existing.value = incoming
+                existing.save()
         return incoming
 
     def save(self):
@@ -408,16 +407,15 @@ class OrganizationSerializer(serializers.Serializer):
 
         # check if fields changed
         for f, v in org_tracked_field.items():
-            if f != "flag_field":
-                if has_changed(org, f):
-                    old_val = old_value(org, f)
-                    changed_data[f] = f"from {old_val} to {v}"
-            else:
+            if f == "flag_field":
                 # check if flag fields changed
                 for f, v in org_tracked_field["flag_field"].items():
                     if flag_has_changed(org, f):
                         changed_data[f] = f"to {v}"
 
+            elif has_changed(org, f):
+                old_val = old_value(org, f)
+                changed_data[f] = f"from {old_val} to {v}"
         org.save()
 
         if "avatar" in data or "avatarType" in data:
@@ -549,10 +547,9 @@ class OrganizationDetailsEndpoint(OrganizationEndpoint):
             return self.respond({"detail": ERR_DEFAULT_ORG}, status=400)
 
         with transaction.atomic():
-            updated = Organization.objects.filter(
+            if updated := Organization.objects.filter(
                 id=organization.id, status=OrganizationStatus.VISIBLE
-            ).update(status=OrganizationStatus.PENDING_DELETION)
-            if updated:
+            ).update(status=OrganizationStatus.PENDING_DELETION):
                 organization.status = OrganizationStatus.PENDING_DELETION
                 schedule = ScheduledDeletion.schedule(organization, days=1, actor=request.user)
                 entry = self.create_audit_entry(

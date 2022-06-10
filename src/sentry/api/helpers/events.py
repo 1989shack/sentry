@@ -11,8 +11,7 @@ def get_direct_hit_response(request, query, snuba_params, referrer):
     Checks whether a query is a direct hit for an event, and if so returns
     a response. Otherwise returns None
     """
-    event_id = normalize_event_id(query)
-    if event_id:
+    if event_id := normalize_event_id(query):
         snuba_filter = get_filter(query=f"id:{event_id}", params=snuba_params)
         snuba_filter.conditions.append(["event.type", "!=", "transaction"])
 

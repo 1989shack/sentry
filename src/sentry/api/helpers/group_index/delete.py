@@ -95,8 +95,7 @@ def delete_groups(
     `search_fn` refers to the `search.query` method with the appropriate
     project, org, environment, and search params already bound
     """
-    group_ids = request.GET.getlist("id")
-    if group_ids:
+    if group_ids := request.GET.getlist("id"):
         group_list = list(
             Group.objects.filter(
                 project__in=projects,

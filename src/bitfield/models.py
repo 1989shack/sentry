@@ -113,8 +113,7 @@ class BitField(BigIntegerField):
         self.labels = labels
 
     def pre_save(self, instance, add):
-        value = getattr(instance, self.attname)
-        return value
+        return getattr(instance, self.attname)
 
     def get_prep_value(self, value):
         if value is None:

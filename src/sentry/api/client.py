@@ -36,11 +36,7 @@ class ApiClient:
         is_superuser=None,
         request=None,
     ):
-        if self.prefix not in path:
-            full_path = self.prefix + path
-        else:
-            full_path = path
-
+        full_path = self.prefix + path if self.prefix not in path else path
         # we explicitly do not allow you to override the request *and* the user
         # as then other checks like is_superuser would need overwritten
         assert not (request and (user or auth)), "use either request or auth"

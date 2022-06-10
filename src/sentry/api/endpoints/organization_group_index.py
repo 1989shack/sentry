@@ -65,7 +65,7 @@ def inbox_search(
     if end_params:
         end = min(end_params)
 
-    end = end if end else now + ALLOWED_FUTURE_DELTA
+    end = end or now + ALLOWED_FUTURE_DELTA
 
     # We only want to search back a week at most, since that's the oldest inbox rows
     # can be.
@@ -77,11 +77,11 @@ def inbox_search(
     if start >= end:
         return Paginator(Group.objects.none()).get_result()
 
-    # Make sure search terms are valid
-    invalid_search_terms = [
-        str(sf) for sf in search_filters if sf.key.name not in allowed_inbox_search_terms
-    ]
-    if invalid_search_terms:
+    if invalid_search_terms := [
+        str(sf)
+        for sf in search_filters
+        if sf.key.name not in allowed_inbox_search_terms
+    ]:
         raise InvalidSearchQuery(f"Invalid search terms for 'inbox' search: {invalid_search_terms}")
 
     # Make sure this is an inbox search
@@ -112,8 +112,9 @@ def inbox_search(
             .distinct()
         )
 
-    owner_search = get_search_filter(search_filters, "assigned_or_suggested", "IN")
-    if owner_search:
+    if owner_search := get_search_filter(
+        search_filters, "assigned_or_suggested", "IN"
+    ):
         qs = qs.filter(
             assigned_or_suggested_filter(owner_search, projects, field_filter="group_id")
         )
@@ -166,7 +167,7 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
             assert "environment" not in extra_query_kwargs
             query_kwargs.update(extra_query_kwargs)
 
-        query_kwargs["environments"] = environments if environments else None
+        query_kwargs["environments"] = environments or None
         if query_kwargs["sort_by"] == "inbox":
             query_kwargs.pop("sort_by")
             result = inbox_search(**query_kwargs)
@@ -257,12 +258,8 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
                 {"detail": "You do not have the multi project stream feature enabled"}, status=400
             )
 
-        # we ignore date range for both short id and event ids
-        query = request.GET.get("query", "").strip()
-        if query:
-            # check to see if we've got an event ID
-            event_id = normalize_event_id(query)
-            if event_id:
+        if query := request.GET.get("query", "").strip():
+            if event_id := normalize_event_id(query):
                 # For a direct hit lookup we want to use any passed project ids
                 # (we've already checked permissions on these) plus any other
                 # projects that the user is a member of. This gives us a better
@@ -283,12 +280,12 @@ class OrganizationGroupIndexEndpoint(OrganizationEventsEndpointBase):
                     return Response(serialize(groups, request.user, serializer()))
 
             group = get_by_short_id(organization.id, request.GET.get("shortIdLookup"), query)
-            if group is not None:
-                # check all projects user has access to
-                if request.access.has_project_access(group.project):
-                    response = Response(serialize([group], request.user, serializer()))
-                    response["X-Sentry-Direct-Hit"] = "1"
-                    return response
+            if group is not None and request.access.has_project_access(
+                group.project
+            ):
+                response = Response(serialize([group], request.user, serializer()))
+                response["X-Sentry-Direct-Hit"] = "1"
+                return response
 
         # If group ids specified, just ignore any query components
         try:

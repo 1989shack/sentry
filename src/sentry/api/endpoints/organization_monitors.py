@@ -45,8 +45,7 @@ class OrganizationMonitorsEndpoint(OrganizationEndpoint):
         queryset = Monitor.objects.filter(
             organization_id=organization.id, project_id__in=filter_params["project_id"]
         ).exclude(status__in=[MonitorStatus.PENDING_DELETION, MonitorStatus.DELETION_IN_PROGRESS])
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "query":

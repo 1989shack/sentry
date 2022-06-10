@@ -17,8 +17,7 @@ class UserIndexEndpoint(Endpoint):
     def get(self, request: Request) -> Response:
         queryset = User.objects.distinct()
 
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "query":

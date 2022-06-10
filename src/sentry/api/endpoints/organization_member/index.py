@@ -51,16 +51,19 @@ class OrganizationMemberSerializer(serializers.Serializer):
         )
 
         if queryset.filter(invite_status=InviteStatus.APPROVED.value).exists():
-            raise MemberConflictValidationError("The user %s is already a member" % email)
+            raise MemberConflictValidationError(f"The user {email} is already a member")
 
-        if not self.context.get("allow_existing_invite_request"):
-            if queryset.filter(
+        if (
+            not self.context.get("allow_existing_invite_request")
+            and queryset.filter(
                 Q(invite_status=InviteStatus.REQUESTED_TO_BE_INVITED.value)
                 | Q(invite_status=InviteStatus.REQUESTED_TO_JOIN.value)
-            ).exists():
-                raise MemberConflictValidationError(
-                    "There is an existing invite request for %s" % email
-                )
+            ).exists()
+        ):
+            raise MemberConflictValidationError(
+                f"There is an existing invite request for {email}"
+            )
+
         return email
 
     def validate_teams(self, teams):
@@ -96,8 +99,7 @@ class OrganizationMemberIndexEndpoint(OrganizationEndpoint):
             .order_by("email", "user__email")
         )
 
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "email":

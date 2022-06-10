@@ -145,13 +145,13 @@ def debounce_update_release_health_data(organization, project_ids):
     """This causes a flush of snuba health data to the postgres tables once
     per minute for the given projects.
     """
-    # Figure out which projects need to get updates from the snuba.
-    should_update = {}
     cache_keys = ["debounce-health:%d" % id for id in project_ids]
     cache_data = cache.get_many(cache_keys)
-    for project_id, cache_key in zip(project_ids, cache_keys):
-        if cache_data.get(cache_key) is None:
-            should_update[project_id] = cache_key
+    should_update = {
+        project_id: cache_key
+        for project_id, cache_key in zip(project_ids, cache_keys)
+        if cache_data.get(cache_key) is None
+    }
 
     if not should_update:
         return
@@ -173,12 +173,7 @@ def debounce_update_release_health_data(organization, project_ids):
             release__version__in=[x[1] for x in project_releases],
         ).values_list("project_id", "release__version")
     )
-    to_upsert = []
-    for key in project_releases:
-        if key not in existing:
-            to_upsert.append(key)
-
-    if to_upsert:
+    if to_upsert := [key for key in project_releases if key not in existing]:
         dates = release_health.get_oldest_health_data_for_releases(to_upsert)
 
         for project_id, version in to_upsert:
@@ -323,26 +318,26 @@ class OrganizationReleasesEndpoint(
                         : total_offset + limit
                     ]
                 )
-                releases_with_session_data = release_health.check_releases_have_health_data(
-                    organization.id,
-                    filter_params["project_id"],
-                    release_versions,
-                    filter_params["start"]
-                    if filter_params["start"]
-                    else datetime.utcnow() - timedelta(days=90),
-                    filter_params["end"] if filter_params["end"] else datetime.utcnow(),
+                releases_with_session_data = (
+                    release_health.check_releases_have_health_data(
+                        organization.id,
+                        filter_params["project_id"],
+                        release_versions,
+                        filter_params["start"] or datetime.utcnow() - timedelta(days=90),
+                        filter_params["end"] or datetime.utcnow(),
+                    )
                 )
+
                 valid_versions = [
                     rv for rv in release_versions if rv not in releases_with_session_data
                 ]
 
-                results = list(
+                return list(
                     Release.objects.filter(
                         organization_id=organization.id,
                         version__in=valid_versions,
                     ).order_by_recent()[qs_offset : qs_offset + limit]
                 )
-                return results
 
             paginator_cls = MergingOffsetPaginator
             paginator_kwargs.update(
@@ -528,15 +523,7 @@ class OrganizationReleasesEndpoint(
                         scope.set_tag("failure_reason", "InvalidRepository")
                         return Response({"refs": [str(e)]}, status=400)
 
-                if not created and not new_projects:
-                    # This is the closest status code that makes sense, and we want
-                    # a unique 2xx response code so people can understand when
-                    # behavior differs.
-                    #   208 Already Reported (WebDAV; RFC 5842)
-                    status = 208
-                else:
-                    status = 201
-
+                status = 208 if not created and not new_projects else 201
                 analytics.record(
                     "release.created",
                     user_id=request.user.id if request.user and request.user.id else None,

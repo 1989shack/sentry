@@ -79,6 +79,6 @@ class AuthConfigEndpoint(Endpoint, OrganizationMixin):
         if "session_expired" in request.COOKIES:
             context["warning"] = WARN_SESSION_EXPIRED
 
-        context.update(additional_context.run_callbacks(request))
+        context |= additional_context.run_callbacks(request)
 
         return context

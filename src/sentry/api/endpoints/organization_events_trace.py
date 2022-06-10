@@ -318,9 +318,9 @@ class OrganizationEventsTraceEndpointBase(OrganizationEventsV2EndpointBase):  # 
             sentry_sdk.set_tag(
                 "trace_view.transactions.grouped", format_grouped_length(len_transactions)
             )
-            projects: Set[int] = set()
-            for transaction in transactions:
-                projects.add(transaction["project.id"])
+            projects: Set[int] = {
+                transaction["project.id"] for transaction in transactions
+            }
 
             len_projects = len(projects)
             sentry_sdk.set_tag("trace_view.projects", len_projects)
@@ -664,7 +664,7 @@ class OrganizationEventsTraceEndpoint(OrganizationEventsTraceEndpointBase):
         root_traces.sort(key=child_sort_key)
         orphans.sort(key=child_sort_key)
 
-        if len(orphans) > 0:
+        if orphans:
             sentry_sdk.set_tag("discover.trace-view.contains-orphans", "yes")
             logger.warning("discover.trace-view.contains-orphans", extra=warning_extra)
 

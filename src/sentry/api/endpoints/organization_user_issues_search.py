@@ -29,9 +29,11 @@ class OrganizationUserIssuesSearchEndpoint(OrganizationEndpoint, EnvironmentMixi
             ).values_list("id", flat=True)[:1000]
         )
 
-        event_users = list(EventUser.objects.filter(email=email, project_id__in=project_ids)[:1000])
-
-        if event_users:
+        if event_users := list(
+            EventUser.objects.filter(email=email, project_id__in=project_ids)[
+                :1000
+            ]
+        ):
             groups = Group.objects.filter(
                 id__in=tagstore.get_group_ids_for_users(
                     project_ids=list({e.project_id for e in event_users}),

@@ -13,9 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _fix_label(label):
-    if isinstance(label, tuple):
-        return ":".join(label)
-    return label
+    return ":".join(label) if isinstance(label, tuple) else label
 
 
 class GroupSimilarIssuesEndpoint(GroupEndpoint):

@@ -83,12 +83,11 @@ class DebugFilesEndpoint(ProjectEndpoint):
     permission_classes = (ProjectReleasePermission,)
 
     def download(self, debug_file_id, project):
-        rate_limited = ratelimits.is_limited(
+        if rate_limited := ratelimits.is_limited(
             project=project,
             key=f"rl:DSymFilesEndpoint:download:{debug_file_id}:{project.id}",
             limit=10,
-        )
-        if rate_limited:
+        ):
             logger.info(
                 "notification.rate_limited",
                 extra={"project_id": project.id, "project_debug_file_id": debug_file_id},
@@ -106,10 +105,10 @@ class DebugFilesEndpoint(ProjectEndpoint):
                 iter(lambda: fp.read(4096), b""), content_type="application/octet-stream"
             )
             response["Content-Length"] = debug_file.file.size
-            response["Content-Disposition"] = 'attachment; filename="{}{}"'.format(
-                posixpath.basename(debug_file.debug_id),
-                debug_file.file_extension,
-            )
+            response[
+                "Content-Disposition"
+            ] = f'attachment; filename="{posixpath.basename(debug_file.debug_id)}{debug_file.file_extension}"'
+
             return response
         except OSError:
             raise Http404
@@ -131,10 +130,11 @@ class DebugFilesEndpoint(ProjectEndpoint):
         :auth: required
         """
         download_requested = request.GET.get("id") is not None
-        if download_requested and (has_download_permission(request, project)):
-            return self.download(request.GET.get("id"), project)
-        elif download_requested:
-            return Response(status=403)
+        if download_requested:
+            if has_download_permission(request, project):
+                return self.download(request.GET.get("id"), project)
+            else:
+                return Response(status=403)
 
         code_id = request.GET.get("code_id")
         debug_id = request.GET.get("debug_id")
@@ -166,16 +166,14 @@ class DebugFilesEndpoint(ProjectEndpoint):
                 | Q(file__headers__icontains=query)
             )
 
-            known_file_format = DIF_MIMETYPES.get(query)
-            if known_file_format:
+            if known_file_format := DIF_MIMETYPES.get(query):
                 q |= Q(file__headers__icontains=known_file_format)
         else:
             q = Q()
 
         file_format_q = Q()
         for file_format in file_formats:
-            known_file_format = DIF_MIMETYPES.get(file_format)
-            if known_file_format:
+            if known_file_format := DIF_MIMETYPES.get(file_format):
                 file_format_q |= Q(file__headers__icontains=known_file_format)
 
         q &= file_format_q
@@ -357,9 +355,7 @@ class DifAssembleEndpoint(ProjectEndpoint):
                 file_response[checksum] = {"state": ChunkFileState.NOT_FOUND, "missingChunks": []}
                 continue
 
-            # Check if all requested chunks have been uploaded.
-            missing_chunks = find_missing_chunks(project.organization, chunks)
-            if missing_chunks:
+            if missing_chunks := find_missing_chunks(project.organization, chunks):
                 file_response[checksum] = {
                     "state": ChunkFileState.NOT_FOUND,
                     "missingChunks": missing_chunks,
@@ -461,9 +457,7 @@ class SourceMapsEndpoint(ProjectEndpoint):
         :auth: required
         """
 
-        archive_name = request.GET.get("name")
-
-        if archive_name:
+        if archive_name := request.GET.get("name"):
             with atomic_transaction(using=router.db_for_write(ReleaseFile)):
                 release = Release.objects.get(
                     organization_id=project.organization_id, projects=project, version=archive_name

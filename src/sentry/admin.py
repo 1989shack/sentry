@@ -41,9 +41,7 @@ class OptionAdmin(admin.ModelAdmin):
     search_fields = ("key",)
 
     def value_repr(self, instance):
-        return '<pre style="display:inline-block;white-space:pre-wrap;">{}</pre>'.format(
-            escape(saferepr(instance.value))
-        )
+        return f'<pre style="display:inline-block;white-space:pre-wrap;">{escape(saferepr(instance.value))}</pre>'
 
     value_repr.short_description = "Value"
     value_repr.allow_tags = True
@@ -209,9 +207,7 @@ class UserAdmin(admin.ModelAdmin):
     inlines = (OrganizationUserInline, AuthIdentityInline)
 
     def get_fieldsets(self, request, obj=None):
-        if not obj:
-            return self.add_fieldsets
-        return super().get_fieldsets(request, obj)
+        return super().get_fieldsets(request, obj) if obj else self.add_fieldsets
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -219,10 +215,12 @@ class UserAdmin(admin.ModelAdmin):
         """
         defaults = {}
         if obj is None:
-            defaults.update(
-                {"form": self.add_form, "fields": admin.util.flatten_fieldsets(self.add_fieldsets)}
-            )
-        defaults.update(kwargs)
+            defaults |= {
+                "form": self.add_form,
+                "fields": admin.util.flatten_fieldsets(self.add_fieldsets),
+            }
+
+        defaults |= kwargs
         return super().get_form(request, obj, **defaults)
 
     def get_urls(self):

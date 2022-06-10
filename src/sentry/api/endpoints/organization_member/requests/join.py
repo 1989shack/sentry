@@ -79,9 +79,9 @@ class OrganizationJoinRequestEndpoint(OrganizationEndpoint):
         result = serializer.validated_data
         email = result["email"]
 
-        member = create_organization_join_request(organization, email, ip_address)
-
-        if member:
+        if member := create_organization_join_request(
+            organization, email, ip_address
+        ):
             async_send_notification(JoinRequestNotification, member, request.user)
             # legacy analytics
             join_request_created.send_robust(sender=self, member=member)

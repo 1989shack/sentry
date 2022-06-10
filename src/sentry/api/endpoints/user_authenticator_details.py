@@ -18,14 +18,17 @@ class UserAuthenticatorDetailsEndpoint(UserEndpoint):
 
     def _get_device_for_rename(self, authenticator, interface_device_id):
         devices = authenticator.config
-        for device in devices["devices"]:
-            # this is for devices registered with webauthn, since the stored data is not a string, we need to decode it
-            if type(device["binding"]) == AuthenticatorData:
-                if decode_credential_id(device) == interface_device_id:
-                    return device
-            elif device["binding"]["keyHandle"] == interface_device_id:
-                return device
-        return None
+        return next(
+            (
+                device
+                for device in devices["devices"]
+                if type(device["binding"]) == AuthenticatorData
+                and decode_credential_id(device) == interface_device_id
+                or type(device["binding"]) != AuthenticatorData
+                and device["binding"]["keyHandle"] == interface_device_id
+            ),
+            None,
+        )
 
     def _rename_device(self, authenticator, interface_device_id, new_name):
         device = self._get_device_for_rename(authenticator, interface_device_id)

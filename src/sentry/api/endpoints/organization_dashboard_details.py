@@ -76,18 +76,18 @@ class OrganizationDashboardDetailsEndpoint(OrganizationDashboardBase):
         num_dashboards = Dashboard.objects.filter(organization=organization).count()
         num_tombstones = DashboardTombstone.objects.filter(organization=organization).count()
 
-        if isinstance(dashboard, dict):
-            if num_dashboards > 0:
-                DashboardTombstone.objects.get_or_create(
-                    organization=organization, slug=dashboard["id"]
-                )
-            else:
-                return self.respond({"Cannot delete last Dashboard."}, status=409)
-        elif (num_dashboards > 1) or (num_tombstones == 0):
-            dashboard.delete()
-        else:
+        if isinstance(dashboard, dict) and num_dashboards > 0:
+            DashboardTombstone.objects.get_or_create(
+                organization=organization, slug=dashboard["id"]
+            )
+        elif (
+            isinstance(dashboard, dict)
+            or num_dashboards <= 1
+            and num_tombstones != 0
+        ):
             return self.respond({"Cannot delete last Dashboard."}, status=409)
-
+        else:
+            dashboard.delete()
         return self.respond(status=204)
 
     def put(self, request: Request, organization, dashboard) -> Response:

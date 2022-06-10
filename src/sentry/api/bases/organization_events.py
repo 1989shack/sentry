@@ -38,7 +38,10 @@ DATASET_OPTIONS = {
 
 def resolve_axis_column(column: str, index: int = 0) -> str:
     return cast(
-        str, get_function_alias(column) if not is_equation(column) else f"equation[{index}]"
+        str,
+        f"equation[{index}]"
+        if is_equation(column)
+        else get_function_alias(column),
     )
 
 
@@ -202,11 +205,7 @@ class OrganizationEventsV2EndpointBase(OrganizationEventsEndpointBase):
         )
 
         base_url = absolute_uri(urlquote(request.path))
-        if querystring:
-            base_url = f"{base_url}?{querystring}"
-        else:
-            base_url = base_url + "?"
-
+        base_url = f"{base_url}?{querystring}" if querystring else f"{base_url}?"
         return cast(str, LINK_HEADER).format(
             uri=base_url,
             cursor=str(cursor),
@@ -263,7 +262,7 @@ class OrganizationEventsV2EndpointBase(OrganizationEventsEndpointBase):
         if "issue" in fields:  # Look up the short ID and return that in the results
             self.handle_issues(results, project_ids, organization)
 
-        if not ("project.id" in first_row or "projectid" in first_row):
+        if "project.id" not in first_row and "projectid" not in first_row:
             return results
 
         for result in results:
@@ -362,25 +361,25 @@ class OrganizationEventsV2EndpointBase(OrganizationEventsEndpointBase):
             # that acts as a placeholder.
             is_multiple_axis = len(query_columns) > 1
             if top_events > 0 and isinstance(result, dict):
-                results = {}
-                for key, event_result in result.items():
-                    if is_multiple_axis:
-                        results[key] = self.serialize_multiple_axis(
-                            serializer,
-                            event_result,
-                            columns,
-                            query_columns,
-                            allow_partial_buckets,
-                            zerofill_results=zerofill_results,
-                        )
-                    else:
-                        # Need to get function alias if count is a field, but not the axis
-                        results[key] = serializer.serialize(
-                            event_result,
-                            column=resolve_axis_column(query_columns[0]),
-                            allow_partial_buckets=allow_partial_buckets,
-                            zerofill_results=zerofill_results,
-                        )
+                results = {
+                    key: self.serialize_multiple_axis(
+                        serializer,
+                        event_result,
+                        columns,
+                        query_columns,
+                        allow_partial_buckets,
+                        zerofill_results=zerofill_results,
+                    )
+                    if is_multiple_axis
+                    else serializer.serialize(
+                        event_result,
+                        column=resolve_axis_column(query_columns[0]),
+                        allow_partial_buckets=allow_partial_buckets,
+                        zerofill_results=zerofill_results,
+                    )
+                    for key, event_result in result.items()
+                }
+
                 serialized_result = results
             elif is_multiple_axis:
                 serialized_result = self.serialize_multiple_axis(
@@ -394,9 +393,7 @@ class OrganizationEventsV2EndpointBase(OrganizationEventsEndpointBase):
                 if top_events > 0 and isinstance(result, SnubaTSResult):
                     serialized_result = {"": serialized_result}
             else:
-                extra_columns = None
-                if comparison_delta:
-                    extra_columns = ["comparisonCount"]
+                extra_columns = ["comparisonCount"] if comparison_delta else None
                 serialized_result = serializer.serialize(
                     result,
                     resolve_axis_column(query_columns[0]),

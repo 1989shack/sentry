@@ -29,7 +29,7 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
             try:
                 desired_plugins.append(plugins.get(slug))
             except KeyError:
-                return Response({"detail": "Plugin %s not found" % slug}, status=404)
+                return Response({"detail": f"Plugin {slug} not found"}, status=404)
 
         # if no plugins were specified, grab all plugins but limit by those that have the ability to be configured
         if not desired_plugins:
@@ -40,7 +40,7 @@ class OrganizationPluginsConfigsEndpoint(OrganizationEndpoint):
         # plugin to work (ex:`opsgenie:api_key`)
         keys_to_check = []
         for plugin in desired_plugins:
-            keys_to_check.append("%s:enabled" % plugin.slug)
+            keys_to_check.append(f"{plugin.slug}:enabled")
             if plugin.required_field:
                 keys_to_check.append(f"{plugin.slug}:{plugin.required_field}")
 

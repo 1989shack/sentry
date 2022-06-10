@@ -39,16 +39,15 @@ class OrganizationStatsEndpoint(OrganizationEndpoint, EnvironmentMixin, StatsMix
         elif group == "project":
             team_list = Team.objects.get_for_user(organization=organization, user=request.user)
 
-            project_ids = request.GET.getlist("projectID")
-            if not project_ids:
+            if project_ids := request.GET.getlist("projectID"):
+                project_list = Project.objects.filter(teams__in=team_list, id__in=project_ids)
+            else:
                 project_list = []
                 for team in team_list:
                     project_list.extend(Project.objects.get_for_user(team=team, user=request.user))
-            else:
-                project_list = Project.objects.filter(teams__in=team_list, id__in=project_ids)
             keys = list({p.id for p in project_list})
         else:
-            raise ValueError("Invalid group: %s" % group)
+            raise ValueError(f"Invalid group: {group}")
 
         if "id" in request.GET:
             id_filter_set = frozenset(map(int, request.GET.getlist("id")))

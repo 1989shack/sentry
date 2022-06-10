@@ -24,8 +24,7 @@ class OrganizationCodeOwnersAssociationsEndpoint(OrganizationEndpoint):
             status=ObjectStatus.VISIBLE,
         )
         project_code_owners = ProjectCodeOwners.objects.filter(project__in=projects)
-        provider = request.GET.get("provider")
-        if provider:
+        if provider := request.GET.get("provider"):
             project_code_owners = project_code_owners.filter(
                 repository_project_path_config__organization_integration__integration__provider=provider
             )

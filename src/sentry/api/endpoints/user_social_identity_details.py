@@ -40,8 +40,6 @@ class UserSocialIdentityDetailsEndpoint(UserEndpoint):
 
             exc_tb = sys.exc_info()[2]
             raise exc.with_traceback(exc_tb)
-            del exc_tb
-
         # XXX(dcramer): we experienced an issue where the identity still existed,
         # and given that this is a cheap query, lets error hard in that case
         assert not UserSocialAuth.objects.filter(user=user, id=identity_id).exists()

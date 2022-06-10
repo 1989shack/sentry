@@ -102,11 +102,10 @@ class TeamDetailsEndpoint(TeamEndpoint):
         immediate. Teams will have their slug released while waiting for deletion.
         """
         suffix = uuid4().hex
-        new_slug = f"{team.slug}-{suffix}"[0:50]
-        updated = Team.objects.filter(id=team.id, status=TeamStatus.VISIBLE).update(
-            slug=new_slug, status=TeamStatus.PENDING_DELETION
-        )
-        if updated:
+        new_slug = f"{team.slug}-{suffix}"[:50]
+        if updated := Team.objects.filter(
+            id=team.id, status=TeamStatus.VISIBLE
+        ).update(slug=new_slug, status=TeamStatus.PENDING_DELETION):
             scheduled = ScheduledDeletion.schedule(team, days=0, actor=request.user)
             self.create_audit_entry(
                 request=request,

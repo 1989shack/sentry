@@ -48,6 +48,6 @@ class APIDocsTestCase(APITestCase):
             "user": {"id": self.user.id, "email": self.user.email},
             "release": name,
         }
-        data.update(kwargs)
+        data |= kwargs
 
         return self.store_event(data=data, project_id=self.project.id)

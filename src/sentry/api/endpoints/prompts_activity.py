@@ -44,7 +44,7 @@ class PromptsActivityEndpoint(Endpoint):
         conditions = None
         for feature in features:
             if not prompt_config.has(feature):
-                return Response({"detail": "Invalid feature name " + feature}, status=400)
+                return Response({"detail": f"Invalid feature name {feature}"}, status=400)
 
             required_fields = prompt_config.required_fields(feature)
             for field in required_fields:
@@ -56,12 +56,11 @@ class PromptsActivityEndpoint(Endpoint):
 
         result = PromptsActivity.objects.filter(conditions, user=request.user)
         featuredata = {k.feature: k.data for k in result}
-        if len(features) == 1:
-            result = result.first()
-            data = None if result is None else result.data
-            return Response({"data": data, "features": featuredata})
-        else:
+        if len(features) != 1:
             return Response({"features": featuredata})
+        result = result.first()
+        data = None if result is None else result.data
+        return Response({"data": data, "features": featuredata})
 
     def put(self, request: Request):
         serializer = PromptsActivitySerializer(data=request.data)

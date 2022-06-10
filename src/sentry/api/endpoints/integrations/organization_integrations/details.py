@@ -75,11 +75,9 @@ class OrganizationIntegrationDetailsEndpoint(OrganizationIntegrationBaseEndpoint
         integration.get_installation(organization.id).uninstall()
 
         with transaction.atomic():
-            updated = OrganizationIntegration.objects.filter(
+            if updated := OrganizationIntegration.objects.filter(
                 id=org_integration.id, status=ObjectStatus.VISIBLE
-            ).update(status=ObjectStatus.PENDING_DELETION)
-
-            if updated:
+            ).update(status=ObjectStatus.PENDING_DELETION):
                 ScheduledDeletion.schedule(org_integration, days=0, actor=request.user)
                 create_audit_entry(
                     request=request,

@@ -23,7 +23,7 @@ def main(slow=False):
         org = Organization.get_default()
         print(f"Mocking org {org.name}")  # NOQA
     else:
-        print("Mocking org {}".format("Default"))  # NOQA
+        print('Mocking org Default')
         org, _ = Organization.objects.get_or_create(slug="default")
 
     for project_name in project_names:
@@ -54,7 +54,7 @@ def main(slow=False):
 
     timestamp = timezone.now()
 
-    print(f"    > Loading normal trace")  # NOQA
+    print("    > Loading normal trace")
     # Normal trace
     create_trace(
         slow,
@@ -94,7 +94,7 @@ def main(slow=False):
         },
     )
 
-    print(f"    > Loading orphan data")  # NOQA
+    print("    > Loading orphan data")
     # Trace only with orphans
     create_trace(
         slow,
@@ -136,7 +136,7 @@ def main(slow=False):
         },
     )
 
-    print(f"    > Loading trace with many siblings")  # NOQA
+    print("    > Loading trace with many siblings")
     create_trace(
         slow,
         timestamp - timedelta(milliseconds=random_normal(4000, 250, 1000)),
@@ -158,7 +158,7 @@ def main(slow=False):
             ],
         },
     )
-    print(f"    > Loading trace with many roots")  # NOQA
+    print("    > Loading trace with many roots")
     trace_id = uuid4().hex
     for _ in range(15):
         create_trace(
@@ -182,7 +182,7 @@ def main(slow=False):
             },
         )
 
-    print(f"    > Loading chained trace with orphans")  # NOQA
+    print("    > Loading chained trace with orphans")
     trace_id = uuid4().hex
     create_trace(
         slow,
@@ -247,7 +247,7 @@ def main(slow=False):
         },
     )
 
-    print(f"    > Loading traces missing instrumentation")  # NOQA
+    print("    > Loading traces missing instrumentation")
     create_trace(
         slow,
         timestamp - timedelta(milliseconds=random_normal(4000, 250, 1000)),

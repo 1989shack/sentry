@@ -63,8 +63,8 @@ class SentryAppDetailsEndpoint(SentryAppBaseEndpoint):
 
         # log any errors with schema
         if "schema" in serializer.errors:
+            name = "sentry_app.schema_validation_error"
             for error_message in serializer.errors["schema"]:
-                name = "sentry_app.schema_validation_error"
                 log_info = {
                     "schema": json.dumps(request.data["schema"]),
                     "user_id": request.user.id,
@@ -86,7 +86,8 @@ class SentryAppDetailsEndpoint(SentryAppBaseEndpoint):
         return Response({"detail": ["Published apps cannot be removed."]}, status=403)
 
     def _has_hook_events(self, request: Request):
-        if not request.json_body.get("events"):
-            return False
-
-        return "error" in request.json_body["events"]
+        return (
+            "error" in request.json_body["events"]
+            if request.json_body.get("events")
+            else False
+        )

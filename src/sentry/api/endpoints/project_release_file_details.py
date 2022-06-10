@@ -137,13 +137,16 @@ class ReleaseFileDetailsMixin:
         getter = _entry_from_index if download_requested else _get_from_index
         releasefile = cls._get_releasefile(release, file_id, getter)
 
-        if download_requested and check_permission_fn():
-            if isinstance(releasefile, ReleaseFile):
-                return cls.download(releasefile)
+        if download_requested:
+            if check_permission_fn():
+                return (
+                    cls.download(releasefile)
+                    if isinstance(releasefile, ReleaseFile)
+                    else cls.download_from_archive(release, releasefile)
+                )
+
             else:
-                return cls.download_from_archive(release, releasefile)
-        elif download_requested:
-            return Response(status=403)
+                return Response(status=403)
 
         return Response(serialize(releasefile, request.user))
 

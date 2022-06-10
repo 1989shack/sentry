@@ -90,8 +90,7 @@ class ProjectRulesEndpoint(ProjectEndpoint):
                 "frequency": data.get("frequency"),
                 "user_id": request.user.id,
             }
-            owner = data.get("owner")
-            if owner:
+            if owner := data.get("owner"):
                 try:
                     kwargs["owner"] = owner.resolve_to_actor().id
                 except (User.DoesNotExist, Team.DoesNotExist):
@@ -103,7 +102,7 @@ class ProjectRulesEndpoint(ProjectEndpoint):
             if data.get("pending_save"):
                 client = RedisRuleStatus()
                 uuid_context = {"uuid": client.uuid}
-                kwargs.update(uuid_context)
+                kwargs |= uuid_context
                 find_channel_id_for_rule.apply_async(kwargs=kwargs)
                 return Response(uuid_context, status=202)
 

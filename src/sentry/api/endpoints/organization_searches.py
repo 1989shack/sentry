@@ -37,7 +37,11 @@ class OrganizationSearchesEndpoint(OrganizationEndpoint):
         try:
             search_type = SearchType(int(request.GET.get("type", 0)))
         except ValueError as e:
-            return Response({"detail": "Invalid input for `type`. Error: %s" % str(e)}, status=400)
+            return Response(
+                {"detail": f"Invalid input for `type`. Error: {str(e)}"},
+                status=400,
+            )
+
         org_searches_q = Q(Q(owner=request.user) | Q(owner__isnull=True), organization=organization)
         global_searches_q = Q(is_global=True)
         saved_searches = list(
@@ -48,12 +52,10 @@ class OrganizationSearchesEndpoint(OrganizationEndpoint):
         )
         results = []
         if saved_searches:
-            pinned_search = None
             # If the saved search has an owner then it's the user's pinned
             # search. The user can only have one pinned search.
             results.append(saved_searches[0])
-            if saved_searches[0].is_pinned:
-                pinned_search = saved_searches[0]
+            pinned_search = saved_searches[0] if saved_searches[0].is_pinned else None
             for saved_search in saved_searches[1:]:
                 # If a search has the same query and sort as the pinned search we
                 # want to use that search as the pinned search
@@ -80,8 +82,10 @@ class OrganizationSearchesEndpoint(OrganizationEndpoint):
                 query=result["query"],
             ).exists():
                 return Response(
-                    {"detail": "Query {} already exists".format(result["query"])}, status=400
+                    {"detail": f'Query {result["query"]} already exists'},
+                    status=400,
                 )
+
 
             try:
                 saved_search = SavedSearch.objects.create(
@@ -101,11 +105,10 @@ class OrganizationSearchesEndpoint(OrganizationEndpoint):
             except IntegrityError:
                 return Response(
                     {
-                        "detail": "The combination ({}, {}, {}) for query {} already exists.".format(
-                            organization.id, result["name"], result["type"], result["query"]
-                        )
+                        "detail": f'The combination ({organization.id}, {result["name"]}, {result["type"]}) for query {result["query"]} already exists.'
                     },
                     status=400,
                 )
+
 
         return Response(serializer.errors, status=400)

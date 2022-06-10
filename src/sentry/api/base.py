@@ -123,7 +123,7 @@ class Endpoint(APIView):
         if querystring is not None:
             base_url = f"{base_url}?{querystring}"
         else:
-            base_url = base_url + "?"
+            base_url = f"{base_url}?"
 
         return LINK_HEADER.format(
             uri=base_url,
@@ -223,10 +223,7 @@ class Endpoint(APIView):
         try:
             with sentry_sdk.start_span(op="base.dispatch.request", description=type(self).__name__):
                 if origin:
-                    if request.auth:
-                        allowed_origins = request.auth.get_allowed_origins()
-                    else:
-                        allowed_origins = None
+                    allowed_origins = request.auth.get_allowed_origins() if request.auth else None
                     if not is_valid_origin(origin, allowed=allowed_origins):
                         response = Response(f"Invalid origin: {origin}", status=400)
                         self.response = self.finalize_response(request, response, *args, **kwargs)
@@ -417,10 +414,7 @@ class StatsMixin:
 
         try:
             end = request.GET.get("until")
-            if end:
-                end = to_datetime(float(end))
-            else:
-                end = datetime.utcnow().replace(tzinfo=utc)
+            end = to_datetime(float(end)) if end else datetime.utcnow().replace(tzinfo=utc)
         except ValueError:
             raise ParseError(detail="until must be a numeric timestamp.")
 

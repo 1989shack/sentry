@@ -48,8 +48,7 @@ class MockJira(StubJiraApiClient, MockService):
         """
         self._throw_if_broken()
 
-        createmeta = self._get_data(project, "createmeta")
-        if createmeta:
+        if createmeta := self._get_data(project, "createmeta"):
             return createmeta
 
         # Fallback to stub data

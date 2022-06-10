@@ -15,10 +15,6 @@ class IndexEndpoint(Endpoint):
         else:
             user = None
 
-        if request.auth:
-            auth = {"scopes": request.auth.get_scopes()}
-        else:
-            auth = None
-
+        auth = {"scopes": request.auth.get_scopes()} if request.auth else None
         context = {"version": "0", "auth": auth, "user": user}
         return Response(context, status=200)

@@ -21,7 +21,7 @@ def merge_message(msg, frontend_msg):
 @click.command()
 @click.argument("locale")
 def cli(locale):
-    catalog_file = "src/sentry/locale/%s/LC_MESSAGES/django.po" % locale
+    catalog_file = f"src/sentry/locale/{locale}/LC_MESSAGES/django.po"
     frontend_file = "build/javascript.po"
     if not os.path.isfile(frontend_file):
         return

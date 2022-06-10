@@ -22,16 +22,11 @@ class AuthLoginEndpoint(Endpoint, OrganizationMixin):
         """
         login_form = AuthenticationForm(request, request.data)
 
-        # Rate limit logins
-        is_limited = ratelimiter.is_limited(
-            "auth:login:username:{}".format(
-                md5_text(login_form.clean_username(request.data.get("username"))).hexdigest()
-            ),
+        if is_limited := ratelimiter.is_limited(
+            f'auth:login:username:{md5_text(login_form.clean_username(request.data.get("username"))).hexdigest()}',
             limit=10,
-            window=60,  # 10 per minute should be enough for anyone
-        )
-
-        if is_limited:
+            window=60,
+        ):
             errors = {"__all__": [login_form.error_messages["rate_limited"]]}
             metrics.incr(
                 "login.attempt", instance="rate_limited", skip_internal=True, sample_rate=1.0

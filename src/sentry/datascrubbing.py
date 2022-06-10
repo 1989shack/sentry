@@ -44,12 +44,13 @@ def get_pii_config(project):
 
 def get_datascrubbing_settings(project):
     org = project.organization
-    rv = {}
-
     exclude_fields_key = "sentry:safe_fields"
-    rv["excludeFields"] = org.get_option(exclude_fields_key, []) + project.get_option(
-        exclude_fields_key, []
-    )
+    rv = {
+        "excludeFields": (
+            org.get_option(exclude_fields_key, [])
+            + project.get_option(exclude_fields_key, [])
+        )
+    }
 
     rv["scrubData"] = org.get_option("sentry:require_scrub_data", False) or project.get_option(
         "sentry:scrub_data", True
@@ -72,9 +73,7 @@ def get_datascrubbing_settings(project):
 
 
 def get_all_pii_configs(project):
-    # Note: This logic is duplicated in Relay store.
-    pii_config = get_pii_config(project)
-    if pii_config:
+    if pii_config := get_pii_config(project):
         yield pii_config
 
     yield sentry_relay.convert_datascrubbing_config(get_datascrubbing_settings(project))
@@ -149,17 +148,16 @@ def _prefix_rule_references_in_rule(custom_rules, rule_def, prefix):
     if not isinstance(rule_def, dict):
         return rule_def
 
-    if rule_def.get("type") == "multiple" and rule_def.get("rules"):
-        rule_def = copy.deepcopy(rule_def)
-        rule_def["rules"] = list(
-            f"{prefix}{x}" if x in custom_rules else x for x in rule_def["rules"]
-        )
-    elif (
-        rule_def.get("type") == "multiple"
-        and rule_def.get("rule")
-        and rule_def["rule"] in custom_rules
-    ):
-        rule_def = copy.deepcopy(rule_def)
-        rule_def["rule"] = "{}{}".format(prefix, rule_def["rule"])
+    if rule_def.get("type") == "multiple":
+        if rule_def.get("rules"):
+            rule_def = copy.deepcopy(rule_def)
+            rule_def["rules"] = [
+                f"{prefix}{x}" if x in custom_rules else x
+                for x in rule_def["rules"]
+            ]
+
+        elif rule_def.get("rule") and rule_def["rule"] in custom_rules:
+            rule_def = copy.deepcopy(rule_def)
+            rule_def["rule"] = f'{prefix}{rule_def["rule"]}'
 
     return rule_def

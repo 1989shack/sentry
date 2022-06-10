@@ -50,9 +50,7 @@ class OrganizationMemberUnreleasedCommitsEndpoint(OrganizationMemberEndpoint):
             )
 
         params = [organization.id, organization.id]
-        for e in email_list:
-            params.append(e.upper())
-
+        params.extend(e.upper() for e in email_list)
         queryset = Commit.objects.raw(query % (", ".join("%s" for _ in email_list),), params)
 
         results = list(queryset)

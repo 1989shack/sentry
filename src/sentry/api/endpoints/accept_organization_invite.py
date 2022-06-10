@@ -61,10 +61,11 @@ class AcceptOrganizationInvite(Endpoint):
             # When SSO is required do *not* set a next_url to return to accept
             # invite. The invite will be accepted after SSO is completed.
             url = (
-                reverse("sentry-accept-invite", args=[member_id, token])
-                if not auth_provider
-                else "/"
+                "/"
+                if auth_provider
+                else reverse("sentry-accept-invite", args=[member_id, token])
             )
+
             auth.initiate_login(self.request, next_url=url)
 
         # If the org has SSO setup, we'll store the invite cookie to later
@@ -77,7 +78,7 @@ class AcceptOrganizationInvite(Endpoint):
             data["ssoProvider"] = provider.name
 
         onboarding_steps = helper.get_onboarding_steps()
-        data.update(onboarding_steps)
+        data |= onboarding_steps
         if any(onboarding_steps.values()):
             add_invite_cookie(request, response, member_id, token)
 

@@ -88,12 +88,12 @@ class UserNotificationDetailsEndpoint(UserEndpoint):
                 key = UserOptionsSettingsKey(key)
             except ValueError:
                 return Response(
-                    {"detail": "Unknown key: %s." % key},
+                    {"detail": f"Unknown key: {key}."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            type = get_type_from_user_option_settings_key(key)
-            if type:
+
+            if type := get_type_from_user_option_settings_key(key):
                 NotificationSetting.objects.update_settings(
                     ExternalProviders.EMAIL,
                     type,

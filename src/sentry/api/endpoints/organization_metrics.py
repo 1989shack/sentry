@@ -143,13 +143,12 @@ class MetricsDataSeriesPaginator(GenericOffsetPaginator):
         offset = cursor.offset if cursor is not None else 0
         data = self.data_fn(offset=offset, limit=limit + 1)
 
-        if isinstance(data.get("groups"), list):
-            has_more = len(data["groups"]) == limit + 1
-            if has_more:
-                data["groups"].pop()
-        else:
+        if not isinstance(data.get("groups"), list):
             raise NotImplementedError
 
+        has_more = len(data["groups"]) == limit + 1
+        if has_more:
+            data["groups"].pop()
         return CursorResult(
             data,
             prev=Cursor(0, max(0, offset - limit), True, offset > 0),

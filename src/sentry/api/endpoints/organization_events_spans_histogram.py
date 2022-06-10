@@ -51,22 +51,21 @@ class OrganizationEventsSpansHistogramEndpoint(OrganizationEventsV2EndpointBase)
 
         with sentry_sdk.start_span(op="discover.endpoint", description="spans_histogram"):
             serializer = SpansHistogramSerializer(data=request.GET)
-            if serializer.is_valid():
-                data = serializer.validated_data
-
-                with self.handle_query_errors():
-                    results = discover.spans_histogram_query(
-                        data["span"],
-                        data.get("query"),
-                        params,
-                        data["numBuckets"],
-                        data["precision"],
-                        min_value=data.get("min"),
-                        max_value=data.get("max"),
-                        data_filter=data.get("dataFilter"),
-                        referrer="api.organization-events-spans-histogram",
-                    )
-
-                return Response(results)
-            else:
+            if not serializer.is_valid():
                 return Response(serializer.errors, status=400)
+            data = serializer.validated_data
+
+            with self.handle_query_errors():
+                results = discover.spans_histogram_query(
+                    data["span"],
+                    data.get("query"),
+                    params,
+                    data["numBuckets"],
+                    data["precision"],
+                    min_value=data.get("min"),
+                    max_value=data.get("max"),
+                    data_filter=data.get("dataFilter"),
+                    referrer="api.organization-events-spans-histogram",
+                )
+
+            return Response(results)

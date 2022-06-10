@@ -29,15 +29,16 @@ class ProjectProcessingIssuesFixEndpoint(ProjectEndpoint):
                 for x in ApiToken.objects.filter(user=request.user).all()
                 if "project:releases" in x.get_scopes()
             ]
-            if not tokens:
-                token = ApiToken.objects.create(
+            token = (
+                tokens[0]
+                if tokens
+                else ApiToken.objects.create(
                     user=request.user,
                     scope_list=["project:releases"],
                     refresh_token=None,
                     expires_at=None,
                 )
-            else:
-                token = tokens[0]
+            )
 
         resp = render_to_response(
             "sentry/reprocessing-script.sh",

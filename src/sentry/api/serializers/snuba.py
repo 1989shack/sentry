@@ -93,9 +93,7 @@ def serialize_noop(organization, item_list, user, lookup):
 
 
 def encoder_noop(row):
-    if not row:
-        return None
-    return row[0]
+    return row[0] if row else None
 
 
 def value_from_row(row, tagkey):
@@ -232,7 +230,7 @@ SnubaLookup(
 
 # Simple tags don't need any special treatment
 for _tag in ("transaction", "os", "os.name", "browser", "browser.name", "device", "device.family"):
-    SnubaLookup(_tag, "tags[%s]" % _tag)
+    SnubaLookup(_tag, f"tags[{_tag}]")
 
 
 class BaseSnubaSerializer:

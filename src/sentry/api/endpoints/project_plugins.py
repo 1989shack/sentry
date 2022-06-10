@@ -10,8 +10,9 @@ from sentry.plugins.base import plugins
 class ProjectPluginsEndpoint(ProjectEndpoint):
     def get(self, request: Request, project) -> Response:
         context = serialize(
-            [plugin for plugin in plugins.configurable_for_project(project, version=None)],
+            list(plugins.configurable_for_project(project, version=None)),
             request.user,
             PluginSerializer(project),
         )
+
         return Response(context)

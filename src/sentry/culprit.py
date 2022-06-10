@@ -14,8 +14,7 @@ from sentry.utils.strings import truncatechars
 
 def generate_culprit(data):
     platform = data.get("platform")
-    exceptions = get_path(data, "exception", "values", filter=True)
-    if exceptions:
+    if exceptions := get_path(data, "exception", "values", filter=True):
         # Synthetic events no longer get a culprit
         last_exception = get_path(exceptions, -1)
         if get_path(last_exception, "mechanism", "synthetic"):
@@ -24,11 +23,7 @@ def generate_culprit(data):
         stacktraces = [e["stacktrace"] for e in exceptions if get_path(e, "stacktrace", "frames")]
     else:
         stacktrace = data.get("stacktrace")
-        if stacktrace and stacktrace.get("frames"):
-            stacktraces = [stacktrace]
-        else:
-            stacktraces = None
-
+        stacktraces = [stacktrace] if stacktrace and stacktrace.get("frames") else None
     culprit = None
 
     if not culprit and stacktraces:
@@ -46,8 +41,7 @@ def get_stacktrace_culprit(stacktrace, platform):
         if not frame:
             continue
         if frame.get("in_app"):
-            culprit = get_frame_culprit(frame, platform=platform)
-            if culprit:
+            if culprit := get_frame_culprit(frame, platform=platform):
                 return culprit
         elif default is None:
             default = get_frame_culprit(frame, platform=platform)
@@ -67,5 +61,5 @@ def get_frame_culprit(frame, platform):
     elif platform in ("javascript", "node"):
         # function and fileloc might be unicode here, so let it coerce
         # to a unicode string if needed.
-        return "{}({})".format(frame.get("function") or "?", fileloc)
-    return "{} in {}".format(fileloc, frame.get("function") or "?")
+        return f'{frame.get("function") or "?"}({fileloc})'
+    return f'{fileloc} in {frame.get("function") or "?"}'

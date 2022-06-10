@@ -182,11 +182,10 @@ class OrganizationMemberDetailsEndpoint(OrganizationMemberEndpoint):
                     return Response({"detail": ERR_RATE_LIMITED}, status=429)
 
                 if result.get("regenerate"):
-                    if request.access.has_scope("member:admin"):
-                        member.regenerate_token()
-                        member.save()
-                    else:
+                    if not request.access.has_scope("member:admin"):
                         return Response({"detail": ERR_INSUFFICIENT_SCOPE}, status=400)
+                    member.regenerate_token()
+                    member.save()
                 if member.token_expired:
                     return Response({"detail": ERR_EXPIRED}, status=400)
                 member.send_invite_email()
@@ -215,8 +214,7 @@ class OrganizationMemberDetailsEndpoint(OrganizationMemberEndpoint):
                     [OrganizationMemberTeam(team=team, organizationmember=member) for team in teams]
                 )
 
-        assigned_role = result.get("role")
-        if assigned_role:
+        if assigned_role := result.get("role"):
             allowed_roles = get_allowed_roles(request, organization)
             allowed_role_ids = {r.id for r in allowed_roles}
 

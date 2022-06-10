@@ -81,12 +81,13 @@ class ProjectTransferEndpoint(ProjectEndpoint):
             "requester": request.user,
         }
         MessageBuilder(
-            subject="{}Request for Project Transfer".format(options.get("mail.subject-prefix")),
+            subject=f'{options.get("mail.subject-prefix")}Request for Project Transfer',
             template="sentry/emails/transfer_project.txt",
             html_template="sentry/emails/transfer_project.html",
             type="org.confirm_project_transfer_request",
             context=context,
         ).send_async([email])
+
 
         self.create_audit_entry(
             request=request,

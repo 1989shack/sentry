@@ -25,6 +25,6 @@ def get_data(attributes: Sequence[Attribute], items: dict[str, Any]) -> Mapping[
         data[attr.name] = attr.extract(nv)
 
     if items:
-        raise ValueError("Unknown attributes: {}".format(", ".join(items.keys())))
+        raise ValueError(f'Unknown attributes: {", ".join(items.keys())}')
 
     return data
