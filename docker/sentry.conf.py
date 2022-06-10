@@ -41,8 +41,9 @@ from sentry.utils.types import Bool
 CONF_ROOT = os.path.dirname(__file__)
 env = os.environ.get
 
-postgres = env("SENTRY_POSTGRES_HOST") or (env("POSTGRES_PORT_5432_TCP_ADDR") and "postgres")
-if postgres:
+if postgres := env("SENTRY_POSTGRES_HOST") or (
+    env("POSTGRES_PORT_5432_TCP_ADDR") and "postgres"
+):
     DATABASES = {
         "default": {
             "ENGINE": "sentry.db.postgres",
@@ -103,38 +104,25 @@ SENTRY_OPTIONS.update(
     }
 )
 
-#########
-# Cache #
-#########
-
-# Sentry currently utilizes two separate mechanisms. While CACHES is not a
-# requirement, it will optimize several high throughput patterns.
-
-memcached = env("SENTRY_MEMCACHED_HOST") or (env("MEMCACHED_PORT_11211_TCP_ADDR") and "memcached")
-if memcached:
+if memcached := env("SENTRY_MEMCACHED_HOST") or (
+    env("MEMCACHED_PORT_11211_TCP_ADDR") and "memcached"
+):
     memcached_port = env("SENTRY_MEMCACHED_PORT") or "11211"
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-            "LOCATION": [memcached + ":" + memcached_port],
+            "LOCATION": [f"{memcached}:{memcached_port}"],
             "TIMEOUT": 3600,
         }
     }
 
+
 # A primary cache is required for things such as processing events
 SENTRY_CACHE = "sentry.cache.redis.RedisCache"
 
-#########
-# Queue #
-#########
-
-# See https://develop.sentry.dev/services/queue/ for more information on
-# configuring your queue broker and workers. Sentry relies on a Python
-# framework called Celery to manage queues.
-
-rabbitmq = env("SENTRY_RABBITMQ_HOST") or (env("RABBITMQ_PORT_5672_TCP_ADDR") and "rabbitmq")
-
-if rabbitmq:
+if rabbitmq := env("SENTRY_RABBITMQ_HOST") or (
+    env("RABBITMQ_PORT_5672_TCP_ADDR") and "rabbitmq"
+):
     BROKER_URL = (
         "amqp://"
         + (env("SENTRY_RABBITMQ_USERNAME") or env("RABBITMQ_ENV_RABBITMQ_DEFAULT_USER") or "guest")
@@ -146,7 +134,7 @@ if rabbitmq:
         + (env("SENTRY_RABBITMQ_VHOST") or env("RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST") or "/")
     )
 else:
-    BROKER_URL = "redis://:" + redis_password + "@" + redis + ":" + redis_port + "/" + redis_db
+    BROKER_URL = f"redis://:{redis_password}@{redis}:{redis_port}/{redis_db}"
 
 
 ###############
@@ -211,13 +199,9 @@ SENTRY_WEB_OPTIONS = {
     # 'workers': 1,  # the number of web workers
 }
 
-###############
-# Mail Server #
-###############
-
-
-email = env("SENTRY_EMAIL_HOST") or (env("SMTP_PORT_25_TCP_ADDR") and "smtp")
-if email:
+if email := env("SENTRY_EMAIL_HOST") or (
+    env("SMTP_PORT_25_TCP_ADDR") and "smtp"
+):
     SENTRY_OPTIONS["mail.backend"] = "smtp"
     SENTRY_OPTIONS["mail.host"] = email
     SENTRY_OPTIONS["mail.password"] = env("SENTRY_EMAIL_PASSWORD") or ""

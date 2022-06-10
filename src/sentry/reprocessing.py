@@ -19,10 +19,10 @@ def event_supports_reprocessing(data):
         return True
     elif platform not in JAVASCRIPT_PLATFORMS:
         return False
-    for stacktrace_info in find_stacktraces_in_data(data):
-        if not stacktrace_info.platforms.isdisjoint(NATIVE_PLATFORMS):
-            return True
-    return False
+    return any(
+        not stacktrace_info.platforms.isdisjoint(NATIVE_PLATFORMS)
+        for stacktrace_info in find_stacktraces_in_data(data)
+    )
 
 
 def get_reprocessing_revision(project, cached=True):

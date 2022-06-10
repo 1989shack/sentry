@@ -43,11 +43,9 @@ class SetupWizard(Endpoint):
 
             return Response(serialize(wizard_data))
         else:
-            # This creates a new available hash url for the project wizard
-            rate_limited = ratelimits.is_limited(
-                key="rl:setup-wizard:ip:%s" % request.META["REMOTE_ADDR"], limit=10
-            )
-            if rate_limited:
+            if rate_limited := ratelimits.is_limited(
+                key=f'rl:setup-wizard:ip:{request.META["REMOTE_ADDR"]}', limit=10
+            ):
                 logger.info("setup-wizard.rate-limit")
                 return Response({"Too many wizard requests"}, status=403)
             wizard_hash = get_random_string(64, allowed_chars="abcdefghijklmnopqrstuvwxyz012345679")

@@ -191,9 +191,9 @@ class OrganizationStatsEndpointV2(OrganizationEventsEndpointBase):
 
     def build_outcomes_query(self, request: Request, organization):
         params = {"organization_id": organization.id}
-        project_ids = self._get_projects_for_orgstats_query(request, organization)
-
-        if project_ids:
+        if project_ids := self._get_projects_for_orgstats_query(
+            request, organization
+        ):
             params["project_id"] = project_ids
 
         return QueryDefinition(request.GET, params)
@@ -205,11 +205,10 @@ class OrganizationStatsEndpointV2(OrganizationEventsEndpointBase):
         req_proj_ids = self.get_requested_project_ids_unchecked(request)
         if self._is_org_total_query(request, req_proj_ids):
             return None
-        else:
-            projects = self.get_projects(request, organization, project_ids=req_proj_ids)
-            if not projects:
-                raise NoProjects("No projects available")
-            return [p.id for p in projects]
+        projects = self.get_projects(request, organization, project_ids=req_proj_ids)
+        if not projects:
+            raise NoProjects("No projects available")
+        return [p.id for p in projects]
 
     def _is_org_total_query(self, request: Request, project_ids):
         return all(

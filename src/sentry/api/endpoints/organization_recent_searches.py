@@ -36,12 +36,20 @@ class OrganizationRecentSearchesEndpoint(OrganizationEndpoint):
         try:
             search_type = SearchType(int(request.GET.get("type", 0)))
         except ValueError as e:
-            return Response({"detail": "Invalid input for `type`. Error: %s" % str(e)}, status=400)
+            return Response(
+                {"detail": f"Invalid input for `type`. Error: {str(e)}"},
+                status=400,
+            )
+
 
         try:
             limit = int(request.GET.get("limit", 3))
         except ValueError as e:
-            return Response({"detail": "Invalid input for `limit`. Error: %s" % str(e)}, status=400)
+            return Response(
+                {"detail": f"Invalid input for `limit`. Error: {str(e)}"},
+                status=400,
+            )
+
 
         query_kwargs = {"organization": organization, "user": request.user, "type": search_type}
 

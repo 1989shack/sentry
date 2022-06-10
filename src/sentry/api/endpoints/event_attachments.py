@@ -33,8 +33,7 @@ class EventAttachmentsEndpoint(ProjectEndpoint):
 
         queryset = EventAttachment.objects.filter(project_id=project.id, event_id=event.event_id)
 
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "query":

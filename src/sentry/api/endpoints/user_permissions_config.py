@@ -13,4 +13,4 @@ class UserPermissionsConfigEndpoint(UserEndpoint):
         """
         List all available permissions that can be applied to a user.
         """
-        return self.respond([p for p in settings.SENTRY_USER_PERMISSIONS])
+        return self.respond(list(settings.SENTRY_USER_PERMISSIONS))

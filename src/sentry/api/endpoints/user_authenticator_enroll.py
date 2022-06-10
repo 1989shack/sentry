@@ -229,7 +229,7 @@ class UserAuthenticatorEnrollEndpoint(UserEndpoint):
                 serializer.data["deviceName"],
                 state,
             )
-            context.update({"device_name": serializer.data["deviceName"]})
+            context["device_name"] = serializer.data["deviceName"]
 
         if interface.status == EnrollmentStatus.ROTATION:
             interface.rotate_in_place()
@@ -239,7 +239,7 @@ class UserAuthenticatorEnrollEndpoint(UserEndpoint):
             except Authenticator.AlreadyEnrolled:
                 return Response(ALREADY_ENROLLED_ERR, status=status.HTTP_400_BAD_REQUEST)
 
-        context.update({"authenticator": interface.authenticator})
+        context["authenticator"] = interface.authenticator
         capture_security_activity(
             account=request.user,
             type="mfa-added",

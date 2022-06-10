@@ -39,9 +39,8 @@ sentry = oauth.remote_app(
 def index():
     access_token = session.get("access_token")
     if access_token is None:
-        return ("<h1>Who are you?</h1>" '<p><a href="{}">Login with Sentry</a></p>').format(
-            url_for("login")
-        )
+        return f'<h1>Who are you?</h1><p><a href="{url_for("login")}">Login with Sentry</a></p>'
+
 
     from urllib.error import HTTPError, URLError
     from urllib.request import Request, urlopen

@@ -31,9 +31,11 @@ class Map(Attribute):
             #  object in it, that object will not be copied.
             items = value.copy()
         else:
-            new_value = {}
-            for attr in self.attributes:
-                new_value[attr.name] = attr.extract(getattr(value, attr.name, None))
+            new_value = {
+                attr.name: attr.extract(getattr(value, attr.name, None))
+                for attr in self.attributes
+            }
+
             items = new_value
 
         return get_data(self.attributes, items)

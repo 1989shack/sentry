@@ -31,8 +31,7 @@ class OrganizationIssuesCountEndpoint(OrganizationEventsEndpointBase):
     ):
         query_kwargs = {"projects": projects}
 
-        query = query.strip()
-        if query:
+        if query := query.strip():
             search_filters = convert_query_values(
                 parse_search_query(query), projects, request.user, environments
             )
@@ -41,9 +40,9 @@ class OrganizationIssuesCountEndpoint(OrganizationEventsEndpointBase):
 
         if extra_query_kwargs is not None:
             assert "environment" not in extra_query_kwargs
-            query_kwargs.update(extra_query_kwargs)
+            query_kwargs |= extra_query_kwargs
 
-        query_kwargs["environments"] = environments if environments else None
+        query_kwargs["environments"] = environments or None
 
         query_kwargs["max_hits"] = ISSUES_COUNT_MAX_HITS_LIMIT
 

@@ -82,9 +82,7 @@ class OrganizationTeamsEndpoint(OrganizationEndpoint):
             organization=organization, status=TeamStatus.VISIBLE
         ).order_by("slug")
 
-        query = request.GET.get("query")
-
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "hasExternalTeams":

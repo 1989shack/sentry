@@ -179,11 +179,12 @@ class OrganizationEventsStatsEndpoint(OrganizationEventsV2EndpointBase):  # type
                     rollup=rollup,
                     limit=top_events,
                     organization=organization,
-                    referrer=referrer + ".find-topn",
+                    referrer=f"{referrer}.find-topn",
                     allow_empty=False,
                     zerofill_results=zerofill_results,
                     include_other=include_other,
                 )
+
             query_details = {
                 "selected_columns": query_columns,
                 "query": query,

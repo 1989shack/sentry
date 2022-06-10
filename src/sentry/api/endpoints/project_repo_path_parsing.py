@@ -64,7 +64,7 @@ class PathMappingSerializer(CamelSnakeSerializer):
             )
 
         def integration_match(integration):
-            return source_url.startswith("https://{}".format(integration.metadata["domain_name"]))
+            return source_url.startswith(f'https://{integration.metadata["domain_name"]}')
 
         def repo_match(repo):
             return source_url.startswith(repo.url)

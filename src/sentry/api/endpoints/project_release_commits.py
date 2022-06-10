@@ -41,9 +41,7 @@ class ProjectReleaseCommitsEndpoint(ProjectEndpoint):
             "commit", "commit__author"
         )
 
-        repo_name = request.query_params.get("repo_name")
-
-        if repo_name:
+        if repo_name := request.query_params.get("repo_name"):
             try:
                 repo = Repository.objects.get(organization_id=organization_id, name=repo_name)
                 queryset = queryset.filter(commit__repository_id=repo.id)

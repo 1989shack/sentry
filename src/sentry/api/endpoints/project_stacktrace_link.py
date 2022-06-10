@@ -56,16 +56,16 @@ class ProjectStacktraceLinkEndpoint(ProjectEndpoint):
 
         commit_id = request.GET.get("commitId")
         platform = request.GET.get("platform")
-        result = {"config": None, "sourceUrl": None}
-
         integrations = Integration.objects.filter(organizations=project.organization_id)
-        # TODO(meredith): should use get_provider.has_feature() instead once this is
-        # no longer feature gated and is added as an IntegrationFeature
-        result["integrations"] = [
-            serialize(i, request.user)
-            for i in integrations
-            if i.has_feature(IntegrationFeatures.STACKTRACE_LINK)
-        ]
+        result = {
+            "config": None,
+            "sourceUrl": None,
+            "integrations": [
+                serialize(i, request.user)
+                for i in integrations
+                if i.has_feature(IntegrationFeatures.STACKTRACE_LINK)
+            ],
+        }
 
         # xxx(meredith): if there are ever any changes to this query, make
         # sure that we are still ordering by `id` because we want to make sure

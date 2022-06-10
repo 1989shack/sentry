@@ -34,8 +34,7 @@ class OrganizationRepositoriesEndpoint(OrganizationEndpoint):
         queryset = Repository.objects.filter(organization_id=organization.id)
 
         status = request.GET.get("status", "active")
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             queryset = queryset.filter(Q(name__icontains=query))
         if status == "active":
             queryset = queryset.filter(status=ObjectStatus.VISIBLE)

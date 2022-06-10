@@ -14,8 +14,9 @@ def upsert_missing_release(project, version):
     try:
         return ReleaseProject.objects.get(project=project, release__version=version).release
     except ReleaseProject.DoesNotExist:
-        rows = release_health.get_oldest_health_data_for_releases([(project.id, version)])
-        if rows:
+        if rows := release_health.get_oldest_health_data_for_releases(
+            [(project.id, version)]
+        ):
             oldest = next(rows.values())
             release = Release.get_or_create(project=project, version=version, date_added=oldest)
             release.add_project(project)
@@ -73,22 +74,21 @@ class ProjectReleaseStatsEndpoint(ProjectEndpoint):
             environments=params.get("environment"),
         )
 
-        users_breakdown = []
-        for data in release_health.get_crash_free_breakdown(
-            project_id=params["project_id"][0],
-            release=version,
-            environments=params.get("environment"),
-            start=release.date_added,
-        ):
-            users_breakdown.append(
-                {
-                    "date": data["date"],
-                    "totalUsers": data["total_users"],
-                    "crashFreeUsers": data["crash_free_users"],
-                    "totalSessions": data["total_sessions"],
-                    "crashFreeSessions": data["crash_free_sessions"],
-                }
+        users_breakdown = [
+            {
+                "date": data["date"],
+                "totalUsers": data["total_users"],
+                "crashFreeUsers": data["crash_free_users"],
+                "totalSessions": data["total_sessions"],
+                "crashFreeSessions": data["crash_free_sessions"],
+            }
+            for data in release_health.get_crash_free_breakdown(
+                project_id=params["project_id"][0],
+                release=version,
+                environments=params.get("environment"),
+                start=release.date_added,
             )
+        ]
 
         return Response(
             serialize({"stats": stats, "statTotals": totals, "usersBreakdown": users_breakdown}),

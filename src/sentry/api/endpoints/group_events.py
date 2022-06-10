@@ -69,11 +69,13 @@ class GroupEventsEndpoint(GroupEndpoint, EnvironmentMixin):
             "group_ids": [group.id],
             "project_id": [group.project_id],
             "organization_id": group.project.organization_id,
-            "start": start if start else default_start,
-            "end": end if end else default_end,
+            "start": start or default_start,
+            "end": end or default_end,
         }
-        direct_hit_resp = get_direct_hit_response(request, query, params, "api.group-events")
-        if direct_hit_resp:
+
+        if direct_hit_resp := get_direct_hit_response(
+            request, query, params, "api.group-events"
+        ):
             return direct_hit_resp
 
         if environments:
@@ -96,9 +98,7 @@ class GroupEventsEndpoint(GroupEndpoint, EnvironmentMixin):
         )
 
     def _get_search_query_and_tags(self, request: Request, group, environments=None):
-        raw_query = request.GET.get("query")
-
-        if raw_query:
+        if raw_query := request.GET.get("query"):
             query_kwargs = parse_query([group.project], raw_query, request.user, environments)
             query = query_kwargs.pop("query", None)
             tags = query_kwargs.pop("tags", {})

@@ -71,14 +71,11 @@ class AuthIndexEndpoint(Endpoint):
                     "u2f_authentication.value_error",
                     extra={"user": request.user.id, "error_message": err},
                 )
-                pass
             except LookupError:
                 logger.warning(
                     "u2f_authentication.interface_not_enrolled",
                     extra={"validated_data": validator.validated_data, "user": request.user.id},
                 )
-                pass
-        # attempt password authentication
         elif "password" in validator.validated_data:
             authenticated = request.user.check_password(validator.validated_data["password"])
             return authenticated
@@ -205,14 +202,14 @@ class AuthIndexEndpoint(Endpoint):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         validator = AuthVerifyValidator(data=request.data)
 
-        if not request.user.is_superuser:
-            if not validator.is_valid():
-                return self.respond(validator.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            authenticated = self._verify_user_via_inputs(validator, request)
-        else:
+        if request.user.is_superuser:
             authenticated = self._validate_superuser(validator, request)
 
+        elif not validator.is_valid():
+            return self.respond(validator.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            authenticated = self._verify_user_via_inputs(validator, request)
         if not authenticated:
             return Response({"detail": {"code": "ignore"}}, status=status.HTTP_403_FORBIDDEN)
 

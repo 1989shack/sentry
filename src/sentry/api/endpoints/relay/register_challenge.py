@@ -87,12 +87,11 @@ class RelayRegisterChallengeEndpoint(Endpoint):
 
         relay, static = relay_from_id(request, relay_id)
 
-        if relay is not None:
-            if relay.public_key != str(public_key):
-                # This happens if we have an ID collision or someone copies an existing id
-                return Response(
-                    {"detail": "Attempted to register agent with a different public key"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        if relay is not None and relay.public_key != str(public_key):
+            # This happens if we have an ID collision or someone copies an existing id
+            return Response(
+                {"detail": "Attempted to register agent with a different public key"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(serialize(challenge))

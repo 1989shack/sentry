@@ -35,7 +35,7 @@ class AssistantSerializer(serializers.Serializer):
         if guide_id:
             return attrs
 
-        if not guide and not guide_id:
+        if not guide:
             raise serializers.ValidationError("Either assistant guide or guide_id is required")
 
         guide_id = manager.get_guide_id(guide)

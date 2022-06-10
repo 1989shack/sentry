@@ -10,11 +10,7 @@ class EmptyIntegerField(serializers.IntegerField):
     """
 
     def to_internal_value(self, data):
-        if data == "":
-            return None
-        return super().to_internal_value(data)
+        return None if data == "" else super().to_internal_value(data)
 
     def run_validation(self, data=empty):
-        if data == "":
-            return None
-        return super().run_validation(data)
+        return None if data == "" else super().run_validation(data)

@@ -23,8 +23,7 @@ class ClientStateListEndpoint(OrganizationEndpoint):
         result = {}
         for category in STATE_CATEGORIES:
             key = get_client_state_key(organization.slug, category, request.user)
-            value = self.client.get(key)
-            if value:
+            if value := self.client.get(key):
                 result[category] = json.loads(value)
         return Response(result)
 
@@ -48,8 +47,7 @@ class ClientStateEndpoint(OrganizationEndpoint):
         return (args, kwargs)
 
     def get(self, request: Request, organization, category, key) -> Response:
-        value = self.client.get(key)
-        if value:
+        if value := self.client.get(key):
             response = HttpResponse(value)
             response["Content-Type"] = "application/json"
             return response

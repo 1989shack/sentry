@@ -53,8 +53,7 @@ class ProjectIndexEndpoint(Endpoint):
             else:
                 queryset = queryset.filter(teams__organizationmember__user=request.user)
 
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             tokens = tokenize_query(query)
             for key, value in tokens.items():
                 if key == "query":

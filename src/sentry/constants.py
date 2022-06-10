@@ -317,8 +317,7 @@ def _load_platform_data() -> None:
         return
 
     for platform in data["platforms"]:
-        integrations = platform.pop("integrations")
-        if integrations:
+        if integrations := platform.pop("integrations"):
             for integration in integrations:
                 integration_id = integration.pop("id")
                 if integration["type"] != "language":

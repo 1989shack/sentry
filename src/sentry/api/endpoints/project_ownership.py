@@ -86,9 +86,7 @@ class ProjectOwnershipSerializer(serializers.Serializer):
                 ownership.codeowners_auto_sync = codeowners_auto_sync
                 changed = True
 
-        changed = self.__modify_auto_assignment(ownership) or changed
-
-        if changed:
+        if changed := self.__modify_auto_assignment(ownership) or changed:
             now = timezone.now()
             if ownership.date_created is None:
                 ownership.date_created = now

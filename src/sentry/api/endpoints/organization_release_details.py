@@ -317,39 +317,37 @@ class OrganizationReleaseDetailsEndpoint(
         if project_id:
             # Add sessions time bound to current project meta data
             environments = set(request.GET.getlist("environment")) or None
-            current_project_meta.update(
-                {
-                    **release_health.get_release_sessions_time_bounds(
-                        project_id=int(project_id),
-                        release=release.version,
-                        org_id=organization.id,
-                        environments=environments,
-                    )
-                }
-            )
+            current_project_meta |= {
+                **release_health.get_release_sessions_time_bounds(
+                    project_id=int(project_id),
+                    release=release.version,
+                    org_id=organization.id,
+                    environments=environments,
+                )
+            }
+
 
             # Get prev and next release to current release
             try:
                 filter_params = self.get_filter_params(request, organization)
-                current_project_meta.update(
-                    {
-                        **self.get_adjacent_releases_to_current_release(
-                            org=organization,
-                            release=release,
-                            filter_params=filter_params,
-                            stats_period=summary_stats_period,
-                            sort=sort,
-                            status_filter=status_filter,
-                            query=query,
-                        ),
-                        **self.get_first_and_last_releases(
-                            org=organization,
-                            environment=filter_params.get("environment"),
-                            project_id=[project_id],
-                            sort=sort,
-                        ),
-                    }
-                )
+                current_project_meta |= {
+                    **self.get_adjacent_releases_to_current_release(
+                        org=organization,
+                        release=release,
+                        filter_params=filter_params,
+                        stats_period=summary_stats_period,
+                        sort=sort,
+                        status_filter=status_filter,
+                        query=query,
+                    ),
+                    **self.get_first_and_last_releases(
+                        org=organization,
+                        environment=filter_params.get("environment"),
+                        project_id=[project_id],
+                        sort=sort,
+                    ),
+                }
+
             except InvalidSortException:
                 return Response({"detail": "invalid sort"}, status=400)
 
@@ -461,10 +459,8 @@ class OrganizationReleaseDetailsEndpoint(
                         }
                         for r in result.get("headCommits", [])
                     ]
-                # Clear commits in release
-                else:
-                    if result.get("refs") == []:
-                        release.clear_commits()
+                elif result.get("refs") == []:
+                    release.clear_commits()
 
             scope.set_tag("has_refs", bool(refs))
             if refs:

@@ -91,9 +91,9 @@ class GroupDetailsEndpoint(GroupEndpoint, EnvironmentMixin):
 
         plugin_issues = []
         for plugin in plugins.for_project(project, version=1):
-            if isinstance(plugin, IssueTrackingPlugin2):
-                if is_plugin_deprecated(plugin, project):
-                    continue
+            if isinstance(
+                plugin, IssueTrackingPlugin2
+            ) and not is_plugin_deprecated(plugin, project):
                 plugin_issues = safe_execute(
                     plugin.plugin_issues, request, group, plugin_issues, _with_transaction=False
                 )
@@ -160,12 +160,13 @@ class GroupDetailsEndpoint(GroupEndpoint, EnvironmentMixin):
             tags = tagstore.get_group_tag_keys(
                 group.project_id, group.id, environment_ids, limit=100
             )
-            if not environment_ids:
-                user_reports = UserReport.objects.filter(group_id=group.id)
-            else:
-                user_reports = UserReport.objects.filter(
+            user_reports = (
+                UserReport.objects.filter(
                     group_id=group.id, environment_id__in=environment_ids
                 )
+                if environment_ids
+                else UserReport.objects.filter(group_id=group.id)
+            )
 
             now = timezone.now()
             hourly_stats = tsdb.rollup(

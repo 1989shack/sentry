@@ -22,7 +22,13 @@ class SentryAppsEndpoint(SentryAppsBaseEndpoint):
     def get(self, request: Request) -> Response:
         status = request.GET.get("status")
 
-        if status == "published":
+        if (
+            status == "published"
+            or status != "published"
+            and status != "unpublished"
+            and status != "internal"
+            and not is_active_superuser(request)
+        ):
             queryset = SentryApp.objects.filter(status=SentryAppStatus.PUBLISHED)
 
         elif status == "unpublished":
@@ -34,11 +40,7 @@ class SentryAppsEndpoint(SentryAppsBaseEndpoint):
             if not is_active_superuser(request):
                 queryset = queryset.filter(owner__in=request.user.get_orgs())
         else:
-            if is_active_superuser(request):
-                queryset = SentryApp.objects.all()
-            else:
-                queryset = SentryApp.objects.filter(status=SentryAppStatus.PUBLISHED)
-
+            queryset = SentryApp.objects.all()
         return self.paginate(
             request=request,
             queryset=queryset,
@@ -102,8 +104,8 @@ class SentryAppsEndpoint(SentryAppsBaseEndpoint):
 
         # log any errors with schema
         if "schema" in serializer.errors:
+            name = "sentry_app.schema_validation_error"
             for error_message in serializer.errors["schema"]:
-                name = "sentry_app.schema_validation_error"
                 log_info = {
                     "schema": json.dumps(data["schema"]),
                     "user_id": request.user.id,
@@ -116,7 +118,8 @@ class SentryAppsEndpoint(SentryAppsBaseEndpoint):
         return Response(serializer.errors, status=400)
 
     def _has_hook_events(self, request: Request):
-        if not request.json_body.get("events"):
-            return False
-
-        return "error" in request.json_body["events"]
+        return (
+            "error" in request.json_body["events"]
+            if request.json_body.get("events")
+            else False
+        )

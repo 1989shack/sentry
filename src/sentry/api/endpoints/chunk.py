@@ -18,7 +18,7 @@ from sentry.utils.files import get_max_file_size
 
 MAX_CHUNKS_PER_REQUEST = 64
 MAX_REQUEST_SIZE = 32 * 1024 * 1024
-MAX_CONCURRENCY = settings.DEBUG and 1 or 8
+MAX_CONCURRENCY = 1 if settings.DEBUG else 8
 HASH_ALGORITHM = "sha1"
 SENTRYCLI_SEMVER_RE = re.compile(r"^sentry-cli\/(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+).*$")
 API_PREFIX = "/api/0"
@@ -110,7 +110,7 @@ class ChunkUploadEndpoint(OrganizationEndpoint):
             files = request.data.getlist("file")
             files += [GzipChunk(chunk) for chunk in request.data.getlist("file_gzip")]
 
-        if len(files) == 0:
+        if not files:
             # No files uploaded is ok
             logger.info("chunkupload.end", extra={"status": status.HTTP_200_OK})
             return Response(status=status.HTTP_200_OK)

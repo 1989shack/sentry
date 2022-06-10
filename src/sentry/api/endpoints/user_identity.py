@@ -18,8 +18,7 @@ class UserIdentityEndpoint(UserEndpoint):
         """
         queryset = Identity.objects.filter(user=user)
 
-        provider = request.GET.get("provider")
-        if provider:
+        if provider := request.GET.get("provider"):
             queryset = queryset.filter(idp__type=provider.lower())
 
         return self.paginate(

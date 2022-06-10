@@ -21,12 +21,11 @@ class ProjectProfilingBaseEndpoint(ProjectEndpoint):  # type: ignore
         except InvalidSearchQuery as err:
             raise ParseError(detail=str(err))
 
-        params.update(
-            {
-                key: value.isoformat() if key in {"start", "end"} else value
-                for key, value in self.get_filter_params(request, project).items()
-            }
-        )
+        params |= {
+            key: value.isoformat() if key in {"start", "end"} else value
+            for key, value in self.get_filter_params(request, project).items()
+        }
+
 
         return params
 

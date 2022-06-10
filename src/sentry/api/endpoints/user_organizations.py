@@ -11,8 +11,7 @@ class UserOrganizationsEndpoint(UserEndpoint):
     def get(self, request: Request, user) -> Response:
         queryset = user.get_orgs()
 
-        query = request.GET.get("query")
-        if query:
+        if query := request.GET.get("query"):
             queryset = queryset.filter(Q(name__icontains=query) | Q(slug__icontains=query))
 
         return self.paginate(

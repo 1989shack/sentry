@@ -73,17 +73,16 @@ class ProjectKeyStatsEndpoint(ProjectEndpoint, StatsMixin):
             raise ParseError(detail="Invalid request data")
 
         # Initialize the response results.
-        response = []
-        for time_string in results["intervals"]:
-            response.append(
-                {
-                    "ts": int(parse_timestamp(time_string).timestamp()),
-                    "total": 0,
-                    "dropped": 0,
-                    "accepted": 0,
-                    "filtered": 0,
-                }
-            )
+        response = [
+            {
+                "ts": int(parse_timestamp(time_string).timestamp()),
+                "total": 0,
+                "dropped": 0,
+                "accepted": 0,
+                "filtered": 0,
+            }
+            for time_string in results["intervals"]
+        ]
 
         # We rely on groups and intervals being index aligned
         for group_result in results["groups"]:

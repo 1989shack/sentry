@@ -17,11 +17,7 @@ class GroupTagsEndpoint(GroupEndpoint):
         # There are 2 use-cases for this method. For the 'Tags' tab we
         # get the top 10 values, for the tag distribution bars we get 9
         # This should ideally just be specified by the client
-        if keys:
-            value_limit = 9
-        else:
-            value_limit = 10
-
+        value_limit = 9 if keys else 10
         environment_ids = [e.id for e in get_environments(request, group.project.organization)]
 
         tag_keys = tagstore.get_group_tag_keys_and_top_values(

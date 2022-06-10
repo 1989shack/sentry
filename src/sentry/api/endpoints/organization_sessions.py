@@ -22,15 +22,10 @@ class OrganizationSessionsEndpoint(OrganizationEventsEndpointBase):
         def data_fn(offset: int, limit: int):
             with self.handle_query_errors():
                 with sentry_sdk.start_span(
-                    op="sessions.endpoint", description="build_sessions_query"
-                ):
-                    request_limit = None
-                    if request.GET.get("per_page") is not None:
-                        request_limit = limit
-                    request_offset = None
-                    if request.GET.get("cursor") is not None:
-                        request_offset = offset
-
+                            op="sessions.endpoint", description="build_sessions_query"
+                        ):
+                    request_limit = limit if request.GET.get("per_page") is not None else None
+                    request_offset = offset if request.GET.get("cursor") is not None else None
                     query = self.build_sessions_query(
                         request, organization, offset=request_offset, limit=request_limit
                     )
@@ -90,13 +85,12 @@ class SessionsDataSeriesPaginator(GenericOffsetPaginator):
         offset = cursor.offset if cursor is not None else 0
         data = self.data_fn(offset=offset, limit=limit + 1)
 
-        if isinstance(data.get("groups"), list):
-            has_more = len(data["groups"]) == limit + 1
-            if has_more:
-                data["groups"].pop()
-        else:
+        if not isinstance(data.get("groups"), list):
             raise NotImplementedError
 
+        has_more = len(data["groups"]) == limit + 1
+        if has_more:
+            data["groups"].pop()
         return CursorResult(
             data,
             prev=Cursor(0, max(0, offset - limit), True, offset > 0),

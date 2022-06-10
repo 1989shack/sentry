@@ -720,11 +720,15 @@ def get_span_description(
     if trace_context["op"] == span_op and int(trace_context["hash"], 16) == int(span_group, 16):
         return data["transaction"]
 
-    for span in data.get("spans", []):
-        if span["op"] == span_op and int(span["hash"], 16) == int(span_group, 16):
-            return span.get("description")
-
-    return None
+    return next(
+        (
+            span.get("description")
+            for span in data.get("spans", [])
+            if span["op"] == span_op
+            and int(span["hash"], 16) == int(span_group, 16)
+        ),
+        None,
+    )
 
 
 def get_example_transaction(

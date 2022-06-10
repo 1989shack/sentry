@@ -92,18 +92,17 @@ class UserIdentityConfigDetailsEndpoint(UserEndpoint):
     def _get_identity(user, category, identity_id) -> Optional[UserIdentityConfig]:
         identity_id = int(identity_id)
 
-        # This fetches and iterates over all the user's identities.
-        # If needed, we could optimize to look directly for the one
-        # object, but we would still need to examine the full set of
-        # Identity objects in order to correctly set the status.
-        for identity in get_identities(user):
-            if identity.category == category and identity.id == identity_id:
-                return identity
-        return None
+        return next(
+            (
+                identity
+                for identity in get_identities(user)
+                if identity.category == category and identity.id == identity_id
+            ),
+            None,
+        )
 
     def get(self, request: Request, user, category, identity_id) -> Response:
-        identity = self._get_identity(user, category, identity_id)
-        if identity:
+        if identity := self._get_identity(user, category, identity_id):
             return Response(serialize(identity))
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)

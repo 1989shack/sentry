@@ -119,8 +119,7 @@ class ProjectReleaseDetailsEndpoint(ProjectEndpoint, ReleaseAnalyticsMixin):
             if kwargs:
                 release.update(**kwargs)
 
-            commit_list = result.get("commits")
-            if commit_list:
+            if commit_list := result.get("commits"):
                 hook = ReleaseHook(project)
                 # TODO(dcramer): handle errors with release payloads
                 hook.set_commits(release.version, commit_list)

@@ -95,10 +95,10 @@ class OrganizationRepositoryDetailsEndpoint(OrganizationEndpoint):
             raise ResourceDoesNotExist
 
         with transaction.atomic():
-            updated = Repository.objects.filter(
-                id=repo.id, status__in=[ObjectStatus.VISIBLE, ObjectStatus.DISABLED]
-            ).update(status=ObjectStatus.PENDING_DELETION)
-            if updated:
+            if updated := Repository.objects.filter(
+                id=repo.id,
+                status__in=[ObjectStatus.VISIBLE, ObjectStatus.DISABLED],
+            ).update(status=ObjectStatus.PENDING_DELETION):
                 repo.status = ObjectStatus.PENDING_DELETION
 
                 # if repo doesn't have commits, delete immediately

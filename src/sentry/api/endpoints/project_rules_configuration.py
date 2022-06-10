@@ -33,8 +33,7 @@ class ProjectRulesConfigurationEndpoint(ProjectEndpoint):
                 continue
 
             if node.id in SENTRY_APP_ACTIONS:
-                custom_actions = node.get_custom_actions(project)
-                if custom_actions:
+                if custom_actions := node.get_custom_actions(project):
                     action_list.extend(custom_actions)
                 continue
 

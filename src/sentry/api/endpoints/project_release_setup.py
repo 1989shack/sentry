@@ -19,10 +19,12 @@ class ProjectReleaseSetupCompletionEndpoint(ProjectEndpoint):
         4. tell sentry about a deploy
         """
 
-        tag_key = "onboard_tag:1:%s" % (project.id)
-        repo_key = "onboard_repo:1:%s" % (project.organization_id)
-        commit_key = "onboard_commit:1:%s" % hash_values([project.organization_id, project.id])
-        deploy_key = "onboard_deploy:1:%s" % hash_values([project.organization_id, project.id])
+        tag_key = f"onboard_tag:1:{project.id}"
+        repo_key = f"onboard_repo:1:{project.organization_id}"
+        commit_key = f"onboard_commit:1:{hash_values([project.organization_id, project.id])}"
+
+        deploy_key = f"onboard_deploy:1:{hash_values([project.organization_id, project.id])}"
+
         onboard_cache = cache.get_many([tag_key, repo_key, commit_key, deploy_key])
 
         tag = onboard_cache.get(tag_key)

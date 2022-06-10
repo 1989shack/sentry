@@ -107,17 +107,12 @@ class BitHandler:
 
     def __init__(self, value, keys, labels=None):
         # TODO: change to bitarray?
-        if value:
-            self._value = int(value)
-        else:
-            self._value = 0
+        self._value = int(value) if value else 0
         self._keys = keys
         self._labels = labels is not None and labels or keys
 
     def __eq__(self, other):
-        if not isinstance(other, BitHandler):
-            return False
-        return self._value == other._value
+        return self._value == other._value if isinstance(other, BitHandler) else False
 
     def __lt__(self, other):
         return int(self._value) < other
@@ -135,10 +130,7 @@ class BitHandler:
         return cmp(self._value, other)
 
     def __repr__(self):
-        return "<{}: {}>".format(
-            self.__class__.__name__,
-            ", ".join(f"{k}={self.get_bit(n).is_set}" for n, k in enumerate(self._keys)),
-        )
+        return f'<{self.__class__.__name__}: {", ".join((f"{k}={self.get_bit(n).is_set}" for n, k in enumerate(self._keys)))}>'
 
     def __str__(self):
         return str(self._value)
@@ -180,7 +172,7 @@ class BitHandler:
         if key.startswith("_"):
             return object.__getattribute__(self, key)
         if key not in self._keys:
-            raise AttributeError("%s is not a valid flag" % key)
+            raise AttributeError(f"{key} is not a valid flag")
         return self.get_bit(self._keys.index(key))
 
     __getitem__ = __getattr__
@@ -189,7 +181,7 @@ class BitHandler:
         if key.startswith("_"):
             return object.__setattr__(self, key, value)
         if key not in self._keys:
-            raise AttributeError("%s is not a valid flag" % key)
+            raise AttributeError(f"{key} is not a valid flag")
         self.set_bit(self._keys.index(key), value)
 
     __setitem__ = __setattr__

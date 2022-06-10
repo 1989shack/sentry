@@ -64,10 +64,10 @@ class SystemOptionsEndpoint(Endpoint):
                 )
 
             try:
-                if not (option.flags & options.FLAG_ALLOW_EMPTY) and not v:
-                    options.delete(k)
-                else:
+                if option.flags & options.FLAG_ALLOW_EMPTY or v:
                     options.set(k, v)
+                else:
+                    options.delete(k)
             except (TypeError, AssertionError) as e:
                 # TODO(chadwhitacre): Use a custom exception for the
                 # immutability case, especially since asserts disappear with

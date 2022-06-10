@@ -54,8 +54,7 @@ def clean_newline_inputs(value, case_insensitive=True):
     for v in value.split("\n"):
         if case_insensitive:
             v = v.lower()
-        v = v.strip()
-        if v:
+        if v := v.strip():
             result.append(v)
     return result
 
@@ -198,8 +197,9 @@ class ProjectAdminSerializer(ProjectMemberSerializer):
         )
         if other is not None:
             raise serializers.ValidationError(
-                "Another project (%s) is already using that slug" % other.name
+                f"Another project ({other.name}) is already using that slug"
             )
+
         return slug
 
     def validate_relayPiiConfig(self, value):
@@ -364,8 +364,7 @@ class ProjectDetailsEndpoint(ProjectEndpoint):
     def _get_unresolved_count(self, project):
         queryset = Group.objects.filter(status=GroupStatus.UNRESOLVED, project=project)
 
-        resolve_age = project.get_option("sentry:resolve_age", None)
-        if resolve_age:
+        if resolve_age := project.get_option("sentry:resolve_age", None):
             queryset = queryset.filter(
                 last_seen__gte=timezone.now() - timedelta(hours=int(resolve_age))
             )

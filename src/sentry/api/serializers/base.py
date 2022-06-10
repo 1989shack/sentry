@@ -92,9 +92,7 @@ class Serializer:
         self, obj: Any, attrs: Mapping[Any, Any], user: Any, **kwargs: Any
     ) -> Optional[MutableMapping[str, Any]]:
         """See documentation for `serialize`."""
-        if obj is None:
-            return None
-        return self.serialize(obj, attrs, user, **kwargs)
+        return None if obj is None else self.serialize(obj, attrs, user, **kwargs)
 
     def get_attrs(self, item_list: List[Any], user: Any, **kwargs: Any) -> MutableMapping[Any, Any]:
         """

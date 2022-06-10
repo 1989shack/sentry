@@ -114,11 +114,10 @@ class ReleaseFilesMixin:
                 {"detail": "File name must not contain special whitespace characters"}, status=400
             )
 
-        dist_name = request.data.get("dist")
-        dist = None
-        if dist_name:
+        if dist_name := request.data.get("dist"):
             dist = release.add_dist(dist_name)
-
+        else:
+            dist = None
         # Quickly check for the presence of this file before continuing with
         # the costly file upload process.
         if ReleaseFile.objects.filter(

@@ -41,8 +41,7 @@ def build_query_params_from_request(
 ) -> MutableMapping[str, Any]:
     query_kwargs = {"projects": projects, "sort_by": request.GET.get("sort", DEFAULT_SORT_OPTION)}
 
-    limit = request.GET.get("limit")
-    if limit:
+    if limit := request.GET.get("limit"):
         try:
             query_kwargs["limit"] = int(limit)
         except ValueError:
@@ -211,11 +210,7 @@ def get_first_last_release(
     group: "Group",
 ) -> Tuple[Optional[Mapping[str, Any]], Optional[Mapping[str, Any]]]:
     first_release = group.get_first_release()
-    if first_release is not None:
-        last_release = group.get_last_release()
-    else:
-        last_release = None
-
+    last_release = group.get_last_release() if first_release is not None else None
     if first_release is not None and last_release is not None:
         first_release, last_release = get_first_last_release_info(
             request, group, [first_release, last_release]
@@ -238,9 +233,7 @@ def get_release_info(request: Request, group: "Group", version: str) -> Mapping[
     except Release.DoesNotExist:
         release = {"version": version}
 
-    # Explicitly typing to satisfy mypy.
-    release_ifo: Mapping[str, Any] = serialize(release, request.user)
-    return release_ifo
+    return serialize(release, request.user)
 
 
 def get_first_last_release_info(

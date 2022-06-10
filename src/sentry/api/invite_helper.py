@@ -106,7 +106,7 @@ class ApiInviteHelper:
         member_joined.send_robust(
             member=self.om,
             organization=self.om.organization,
-            sender=self.instance if self.instance else self,
+            sender=self.instance or self,
         )
 
     def handle_member_already_exists(self):
@@ -153,12 +153,13 @@ class ApiInviteHelper:
 
     @property
     def member_already_exists(self):
-        if not self.user_authenticated:
-            return False
-
-        return OrganizationMember.objects.filter(
-            organization=self.om.organization, user=self.request.user
-        ).exists()
+        return (
+            OrganizationMember.objects.filter(
+                organization=self.om.organization, user=self.request.user
+            ).exists()
+            if self.user_authenticated
+            else False
+        )
 
     @property
     def valid_request(self):
@@ -187,11 +188,15 @@ class ApiInviteHelper:
             provider = None
 
         # If SSO is required, check for valid AuthIdentity
-        if provider and not provider.flags.allow_unlinked:
-            # AuthIdentity has a unique constraint on provider and user
-            if not AuthIdentity.objects.filter(auth_provider=provider, user=user).exists():
-                self.handle_member_has_no_sso()
-                return
+        if (
+            provider
+            and not provider.flags.allow_unlinked
+            and not AuthIdentity.objects.filter(
+                auth_provider=provider, user=user
+            ).exists()
+        ):
+            self.handle_member_has_no_sso()
+            return
 
         om.set_user(user)
         om.save()

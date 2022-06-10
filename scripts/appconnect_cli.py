@@ -68,8 +68,7 @@ def appconnect_config():
     for config in symbol_sources:
         if config["type"] == "appStoreConnect":
             return config
-    else:
-        raise KeyError("appStoreConnect config not found")
+    raise KeyError("appStoreConnect config not found")
 
 
 if __name__ == "__main__":

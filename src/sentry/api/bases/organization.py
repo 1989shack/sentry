@@ -334,8 +334,7 @@ class OrganizationEndpoint(Endpoint):
             "organization_id": organization.id,
         }
 
-        environments = self.get_environments(request, organization)
-        if environments:
+        if environments := self.get_environments(request, organization):
             params["environment"] = [env.name for env in environments]
             params["environment_objects"] = environments
 
@@ -409,9 +408,9 @@ class OrganizationReleasesBaseEndpoint(OrganizationEndpoint):
         has_perms = None
         key = None
         if getattr(request, "user", None) and request.user.id:
-            actor_id = "user:%s" % request.user.id
+            actor_id = f"user:{request.user.id}"
         if getattr(request, "auth", None) and request.auth.id:
-            actor_id = "apikey:%s" % request.auth.id
+            actor_id = f"apikey:{request.auth.id}"
         if actor_id is not None:
             project_ids = sorted(self.get_requested_project_ids_unchecked(request))
             key = "release_perms:1:%s" % hash_values(

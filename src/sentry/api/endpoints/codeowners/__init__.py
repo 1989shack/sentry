@@ -114,7 +114,7 @@ class ProjectCodeOwnersMixin:
         )
 
     def track_response_code(self, type: str, status: int | str) -> None:
-        if type in ["create", "update"]:
+        if type in {"create", "update"}:
             metrics.incr(
                 f"codeowners.{type}.http_response",
                 sample_rate=1.0,

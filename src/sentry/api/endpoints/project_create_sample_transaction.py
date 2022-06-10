@@ -17,14 +17,16 @@ base_platforms_with_transactions = ["javascript", "python", "apple-ios"]
 
 
 def get_json_name(project):
-    for base_platform in base_platforms_with_transactions:
-        if project.platform and project.platform.startswith(base_platform):
-            # special case for javascript
-            if base_platform == "javascript":
-                return "react-transaction.json"
-            return f"{base_platform}-transaction.json"
-    # default
-    return "react-transaction.json"
+    return next(
+        (
+            "react-transaction.json"
+            if base_platform == "javascript"
+            else f"{base_platform}-transaction.json"
+            for base_platform in base_platforms_with_transactions
+            if project.platform and project.platform.startswith(base_platform)
+        ),
+        "react-transaction.json",
+    )
 
 
 def fix_event_data(data):
