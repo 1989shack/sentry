@@ -6705,13 +6705,13 @@ css-loader@^3.6.0, css-loader@^5.0.1, css-loader@^5.2.6:
     schema-utils "^3.0.0"
     semver "^7.3.5"
 
-css-minimizer-webpack-plugin@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/css-minimizer-webpack-plugin/-/css-minimizer-webpack-plugin-4.0.0.tgz#e11800388c19c2b7442c39cc78ac8ae3675c9605"
-  integrity sha512-7ZXXRzRHvofv3Uac5Y+RkWRNo0ZMlcg8e9/OtrqUYmwDWJo+qs67GvdeFrXLsFb7czKNwjQhPkM0avlIYl+1nA==
+css-minimizer-webpack-plugin@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/css-minimizer-webpack-plugin/-/css-minimizer-webpack-plugin-4.2.0.tgz#99b453efcbc4c13d80327d94767f5aa41ee509e7"
+  integrity sha512-9FKGMGafKmYEbHoPh78nrrvumS5yU1rhptqdC2RfTH78MohjxpGMTW2tvdY/iYbD2sLnhzZMKTQ4n9Ja48kxZQ==
   dependencies:
     cssnano "^5.1.8"
-    jest-worker "^27.5.1"
+    jest-worker "^29.0.3"
     postcss "^8.4.13"
     schema-utils "^4.0.0"
     serialize-javascript "^6.0.0"
@@ -10334,7 +10334,7 @@ jest-worker@^26.6.2:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jest-worker@^27.0.2, jest-worker@^27.5.1:
+jest-worker@^27.0.2:
   version "27.5.1"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.5.1.tgz#8d146f0900e8973b106b6f73cc1e9a8cb86f8db0"
   integrity sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==
@@ -10347,6 +10347,15 @@ jest-worker@^28.1.0:
   version "28.1.0"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-28.1.0.tgz#ced54757a035e87591e1208253a6e3aac1a855e5"
   integrity sha512-ZHwM6mNwaWBR52Snff8ZvsCTqQsvhCxP/bT1I6T6DAnb6ygkshsyLQIMxFwHpYxht0HOoqt23JlC01viI7T03A==
+  dependencies:
+    "@types/node" "*"
+    merge-stream "^2.0.0"
+    supports-color "^8.0.0"
+
+jest-worker@^29.0.3:
+  version "29.1.0"
+  resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-29.1.0.tgz#374d741b976a868e39141d63fb401abacc07a8c9"
+  integrity sha512-yr7RFRAxI+vhL/cGB9B0FhD+QfaWh1qSxurx7gLP16dfmqhG8w75D/CQFU8ZetvhiQqLZh8X0C4rxwsZy6HITQ==
   dependencies:
     "@types/node" "*"
     merge-stream "^2.0.0"
