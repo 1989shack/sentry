@@ -1768,6 +1768,13 @@
   dependencies:
     "@sinclair/typebox" "^0.23.3"
 
+"@jest/schemas@^29.0.0":
+  version "29.0.0"
+  resolved "https://registry.yarnpkg.com/@jest/schemas/-/schemas-29.0.0.tgz#5f47f5994dd4ef067fb7b4188ceac45f77fe952a"
+  integrity sha512-3Ab5HgYIIAnS0HjqJHQYZS+zXc4tUmTmBH3z83ajI6afXp8X3ZtdLX+nXx+I7LNkJD7uN9LAVhgnjDgZa2z0kA==
+  dependencies:
+    "@sinclair/typebox" "^0.24.1"
+
 "@jest/source-map@^28.0.2":
   version "28.0.2"
   resolved "https://registry.yarnpkg.com/@jest/source-map/-/source-map-28.0.2.tgz#914546f4410b67b1d42c262a1da7e0406b52dc90"
@@ -1856,6 +1863,18 @@
   integrity sha512-xmEggMPr317MIOjjDoZ4ejCSr9Lpbt/u34+dvc99t7DS8YirW5rwZEhzKPC2BMUFkUhI48qs6qLUSGw5FuL0GA==
   dependencies:
     "@jest/schemas" "^28.0.2"
+    "@types/istanbul-lib-coverage" "^2.0.0"
+    "@types/istanbul-reports" "^3.0.0"
+    "@types/node" "*"
+    "@types/yargs" "^17.0.8"
+    chalk "^4.0.0"
+
+"@jest/types@^29.1.2":
+  version "29.1.2"
+  resolved "https://registry.yarnpkg.com/@jest/types/-/types-29.1.2.tgz#7442d32b16bcd7592d9614173078b8c334ec730a"
+  integrity sha512-DcXGtoTykQB5jiwCmVr8H4vdg2OJhQex3qPkG+ISyDO7xQXbt/4R6dowcRyPemRnkH7JoHvZuxPBdlq+9JxFCg==
+  dependencies:
+    "@jest/schemas" "^29.0.0"
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/istanbul-reports" "^3.0.0"
     "@types/node" "*"
@@ -2993,6 +3012,11 @@
   version "0.23.5"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.23.5.tgz#93f7b9f4e3285a7a9ade7557d9a8d36809cbc47d"
   integrity sha512-AFBVi/iT4g20DHoujvMH1aEDn8fGJh4xsRGCP6d8RpLPMqsNPvW01Jcn0QysXTsg++/xj25NmJsGyH9xug/wKg==
+
+"@sinclair/typebox@^0.24.1":
+  version "0.24.44"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.44.tgz#0a0aa3bf4a155a678418527342a3ee84bd8caa5c"
+  integrity sha512-ka0W0KN5i6LfrSocduwliMMpqVgohtPFidKdMEOUjoOFCHcOOYkKsPRxfs5f15oPNHTm6ERAm0GV/+/LTKeiWg==
 
 "@sindresorhus/slugify@^1.0.0":
   version "1.1.2"
@@ -6705,14 +6729,14 @@ css-loader@^3.6.0, css-loader@^5.0.1, css-loader@^5.2.6:
     schema-utils "^3.0.0"
     semver "^7.3.5"
 
-css-minimizer-webpack-plugin@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/css-minimizer-webpack-plugin/-/css-minimizer-webpack-plugin-4.0.0.tgz#e11800388c19c2b7442c39cc78ac8ae3675c9605"
-  integrity sha512-7ZXXRzRHvofv3Uac5Y+RkWRNo0ZMlcg8e9/OtrqUYmwDWJo+qs67GvdeFrXLsFb7czKNwjQhPkM0avlIYl+1nA==
+css-minimizer-webpack-plugin@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/css-minimizer-webpack-plugin/-/css-minimizer-webpack-plugin-4.2.1.tgz#ed5631d8d266b4e2d1389c502a746a93453423e8"
+  integrity sha512-ub12STsk3uXfHFTn9dtkI9nebvUKQ9rB0pn/6WNMRV77nqAOlOOJrrvsP8S8jngcnu+8ll3/9/xa7RCUNBVdOA==
   dependencies:
     cssnano "^5.1.8"
-    jest-worker "^27.5.1"
-    postcss "^8.4.13"
+    jest-worker "^29.1.2"
+    postcss "^8.4.17"
     schema-utils "^4.0.0"
     serialize-javascript "^6.0.0"
     source-map "^0.6.1"
@@ -10299,6 +10323,18 @@ jest-util@^28.1.0:
     graceful-fs "^4.2.9"
     picomatch "^2.2.3"
 
+jest-util@^29.1.2:
+  version "29.1.2"
+  resolved "https://registry.yarnpkg.com/jest-util/-/jest-util-29.1.2.tgz#ac5798e93cb6a6703084e194cfa0898d66126df1"
+  integrity sha512-vPCk9F353i0Ymx3WQq3+a4lZ07NXu9Ca8wya6o4Fe4/aO1e1awMMprZ3woPFpKwghEOW+UXgd15vVotuNN9ONQ==
+  dependencies:
+    "@jest/types" "^29.1.2"
+    "@types/node" "*"
+    chalk "^4.0.0"
+    ci-info "^3.2.0"
+    graceful-fs "^4.2.9"
+    picomatch "^2.2.3"
+
 jest-validate@^28.1.0:
   version "28.1.0"
   resolved "https://registry.yarnpkg.com/jest-validate/-/jest-validate-28.1.0.tgz#8a6821f48432aba9f830c26e28226ad77b9a0e18"
@@ -10334,7 +10370,7 @@ jest-worker@^26.6.2:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jest-worker@^27.0.2, jest-worker@^27.5.1:
+jest-worker@^27.0.2:
   version "27.5.1"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.5.1.tgz#8d146f0900e8973b106b6f73cc1e9a8cb86f8db0"
   integrity sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==
@@ -10349,6 +10385,16 @@ jest-worker@^28.1.0:
   integrity sha512-ZHwM6mNwaWBR52Snff8ZvsCTqQsvhCxP/bT1I6T6DAnb6ygkshsyLQIMxFwHpYxht0HOoqt23JlC01viI7T03A==
   dependencies:
     "@types/node" "*"
+    merge-stream "^2.0.0"
+    supports-color "^8.0.0"
+
+jest-worker@^29.1.2:
+  version "29.1.2"
+  resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-29.1.2.tgz#a68302af61bce82b42a9a57285ca7499d29b2afc"
+  integrity sha512-AdTZJxKjTSPHbXT/AIOjQVmoFx0LHFcVabWu0sxI7PAy7rFf8c0upyvgBKgguVXdM4vY74JdwkyD4hSmpTW8jA==
+  dependencies:
+    "@types/node" "*"
+    jest-util "^29.1.2"
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
@@ -12402,10 +12448,10 @@ postcss@^7.0.26, postcss@^7.0.32, postcss@^7.0.36:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.2.1, postcss@^8.2.15, postcss@^8.4.13:
-  version "8.4.14"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.14.tgz#ee9274d5622b4858c1007a74d76e42e56fd21caf"
-  integrity sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==
+postcss@^8.2.1, postcss@^8.2.15, postcss@^8.4.13, postcss@^8.4.17:
+  version "8.4.17"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.17.tgz#f87863ec7cd353f81f7ab2dec5d67d861bbb1be5"
+  integrity sha512-UNxNOLQydcOFi41yHNMcKRZ39NeXlr8AxGuZJsdub8vIb12fHzcq37DTU/QtbI6WLxNg2gF9Z+8qtRwTj1UI1Q==
   dependencies:
     nanoid "^3.3.4"
     picocolors "^1.0.0"
