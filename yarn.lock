@@ -6520,10 +6520,10 @@ core-js@^1.0.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-1.2.7.tgz#652294c14651db28fa93bd2d5ff2983a4f08c636"
   integrity sha1-ZSKUwUZR2yj6k70tX/KYOk8IxjY=
 
-core-js@^3.0.4, core-js@^3.22.7, core-js@^3.6.5, core-js@^3.8.2:
-  version "3.22.7"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.22.7.tgz#8d6c37f630f6139b8732d10f2c114c3f1d00024f"
-  integrity sha512-Jt8SReuDKVNZnZEzyEQT5eK6T2RRCXkfTq7Lo09kpm+fHjgGewSbNjV+Wt4yZMhPDdzz2x1ulI5z/w4nxpBseg==
+core-js@^3.0.4, core-js@^3.26.0, core-js@^3.6.5, core-js@^3.8.2:
+  version "3.26.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.26.0.tgz#a516db0ed0811be10eac5d94f3b8463d03faccfe"
+  integrity sha512-+DkDrhoR4Y0PxDz6rurahuB+I45OsEUv8E1maPTB6OuHRohMMcznBq9TMpdpDMm/hUPob/mJJS3PqgbHpMTQgw==
 
 core-util-is@~1.0.0:
   version "1.0.2"
